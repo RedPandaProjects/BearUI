@@ -75,7 +75,7 @@ void BearUI::BearUIComboBox::Reset()
 	UIText.Flags. and (~UIFlags::UI_NoClip);
 	UIText.Font = Font;
 	UIText.Text = TEXT("");
-	if (Items.size() < SelectItem)
+	if (static_cast<bint>(Items.size()) < SelectItem)
 	{
 		SelectItem = -1;
 	}
