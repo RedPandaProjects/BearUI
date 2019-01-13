@@ -78,10 +78,12 @@ void BearUI::BearUIComboBox::Reset()
 	if (static_cast<bint>(Items.size()) < SelectItem)
 	{
 		SelectItem = -1;
+		UIListBox.SelectItem = -1;
 	}
 	if (SelectItem >= 0)
 	{
 		UIText.Text = Items[SelectItem];
+		UIListBox.SelectItem = SelectItem;
 	}
 	BearUIItem::Reset();
 }

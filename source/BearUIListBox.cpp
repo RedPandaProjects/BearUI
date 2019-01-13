@@ -78,9 +78,17 @@ void BearUI::BearUIListBox::Reset()
 	}
 	else if (Items.size() < UIItems.size())
 	{
+		auto b = UIItems.begin()+ Items.size();
+		auto e = UIItems.end();
+		while (b != e)
+		{
+			PopItem(**b);
+			b++;
+		}
 		UIItems.resize(Items.size());
 	}
 	{
+		
 		auto b = UIItems.begin();
 		auto e = UIItems.end();
 		bsize ID = 0;
@@ -108,8 +116,12 @@ void BearUI::BearUIListBox::Reset()
 
 	UIBackground.Rect = Rect;
 	UIBackground.Color = ColorBackground;
-	SelectItem = -1;
+
 	BearUIItem::Reset();
+	if (SelectItem >= Items.size())
+		SelectItem = -1;
+	else
+		UIItems[SelectItem]->OnMessage(BearUIListItem::LI_Click);
 }
 
 void BearUI::BearUIListBox::KillFocus()

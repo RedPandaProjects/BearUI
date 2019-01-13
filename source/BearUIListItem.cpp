@@ -40,9 +40,12 @@ void BearUI::BearUIListItem::OnMessage(int32 message)
 {
 	switch (message)
 	{
-	case M_MouseLClick:
-		if(CallBack)CallBack->Call<void>(CallBack_Class,this);
+	case LI_Click:
+		if (CallBack)CallBack->Call<void>(CallBack_Class, this);
 		UITexture.Color = ColorSelected;
+		break;
+	case M_MouseLClick:
+		OnMessage(LI_Click);
 		break;
 	default:
 		break;

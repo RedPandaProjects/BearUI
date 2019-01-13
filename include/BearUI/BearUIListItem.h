@@ -25,14 +25,9 @@ namespace BearUI
 	public:
 		virtual void Draw(BearUI * ui, float time);
 		virtual void Update();
-		enum Message
+		enum MessageListItem
 		{
-			M_MouseLevae,
-			M_MouseEnter,
-			M_MouseLClick,
-			M_MouseRClick,
-			M_MouseLUp,
-			M_MouseRUP,
+			LI_Click=0x100,
 		};
 		virtual void OnMessage(int32 message);
 		virtual bool OnMouse(float x, float y);
