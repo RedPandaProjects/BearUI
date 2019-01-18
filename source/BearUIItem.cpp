@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIItem::BearUIItem():m_mouse_enter(false), Focus(0), m_focus_item(0)
+BearUI::BearUIItem::BearUIItem():m_mouse_enter(false), Focus(0), m_focus_item(0), Enable(true)
 {
 }
 
