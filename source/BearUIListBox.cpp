@@ -118,7 +118,7 @@ void BearUI::BearUIListBox::Reset()
 	UIBackground.Color = ColorBackground;
 
 	BearUIItem::Reset();
-	if (SelectItem >= Items.size())
+	if (SelectItem<0&&bsize(SelectItem) >= Items.size())
 		SelectItem = -1;
 	else
 		UIItems[SelectItem]->OnMessage(BearUIListItem::LI_Click);
