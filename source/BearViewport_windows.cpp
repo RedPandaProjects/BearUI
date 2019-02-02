@@ -23,17 +23,55 @@ LRESULT CALLBACK GlobalOnEvent(HWND handle, UINT message, WPARAM wParam, LPARAM 
 	}
 	return DefWindowProc(handle, message, wParam, lParam);
 }
+LRESULT CALLBACK GlobalOnEventNoClosed(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_CLOSE:
+		return 0;
+		break;
+	case WM_CREATE:
+		SetWindowLongPtrW(handle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams));
+		break;
+	}
+	{
+		auto viewport = reinterpret_cast<BearUI::BearViewport*>(GetWindowLongPtrW(handle, GWLP_USERDATA));
+		if (viewport)
+		{
+			viewport->OnEvent(handle, message, wParam, lParam);
+		}
+	}
+	return DefWindowProc(handle, message, wParam, lParam);
+}
 
 
 static bool LBWindowsClass = false;
-static void RegisterWindowsClass(HINSTANCE hInstance)
+static bool LBWindowsClassNC = false;
+static void RegisterWindowsClass(HINSTANCE hInstance,bool closed)
 {
-	if (LBWindowsClass)return;
-	LBWindowsClass = true;
+	if (closed)
+	{
+		if (LBWindowsClass)return;
+		LBWindowsClass = true;
+	}
+	else
+	{
+		if (LBWindowsClassNC)return;
+		LBWindowsClassNC = true;
+	}
+
 
 	WNDCLASSEX wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = GlobalOnEvent;
+	if (closed)
+	{
+		wc.lpfnWndProc = GlobalOnEvent;
+	}
+	else
+	{
+		wc.lpfnWndProc = GlobalOnEventNoClosed;
+	}
+
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
@@ -42,24 +80,39 @@ static void RegisterWindowsClass(HINSTANCE hInstance)
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = CreateSolidBrush(RGB(69, 22, 28));
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = TEXT("BEAR");
+	if (closed)
+	{
+		wc.lpszClassName = TEXT("BEAR");
+	}
+	else
+	{
+		wc.lpszClassName = TEXT("BEARNC");
+	}
 	wc.cbSize = sizeof(WNDCLASSEX);
 	RegisterClassEx(&wc);
 }
-BearUI::BearViewport::BearViewport(bsize width, bsize height, bool fullscreen):m_width(width),m_height(height), m_mouse_enter(false)
+BearUI::BearViewport::BearViewport(bsize width, bsize height, bool fullscreen, BearCore::BearFlags<int32> flags):m_width(width),m_height(height), m_mouse_enter(false)
 {
 	m_events_item = m_events.end();
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
-
-	RegisterWindowsClass(hInstance);
-
+	RegisterWindowsClass(hInstance,!flags.test(TW_WIHTOUT_CLOSED));
 
 
-	DWORD Style = WS_OVERLAPPED | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+
+	DWORD Style = WS_POPUP;
+	if (!flags.test(TW_POPUP))Style = WS_OVERLAPPED | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
 	{
 		RECT rectangle = { 0, 0, static_cast<long>(width), static_cast<long>(height) };
-		m_window = CreateWindow(TEXT("BEAR"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
+
+		if (!flags.test(TW_WIHTOUT_CLOSED))
+		{
+			m_window = CreateWindow(TEXT("BEAR"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
+		}
+		else
+		{
+			m_window = CreateWindow(TEXT("BEARNC"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
+		}
 
 		AdjustWindowRect(&rectangle, GetWindowLong((HWND)m_window, GWL_STYLE), false);
 		SetWindowPos((HWND)m_window, NULL, 0, 0, rectangle.right - rectangle.left, rectangle.bottom - rectangle.top, SWP_NOMOVE | SWP_NOZORDER);

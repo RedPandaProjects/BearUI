@@ -43,7 +43,12 @@ namespace BearUI
 	
 		
 	public:
-		BearViewport(bsize width = 0x400,bsize height=0x300,bool fullscreen=false);
+		enum TypeWindow
+		{
+			TW_POPUP = 1,
+			TW_WIHTOUT_CLOSED = 2,
+		};
+		BearViewport(bsize width = 0x400,bsize height=0x300,bool fullscreen=false, BearCore::BearFlags<int32> flags=0);
 		~BearViewport();
 		virtual void Resize(bsize width, bsize height);
 		virtual void SetFullScreen(bool fullscreen);

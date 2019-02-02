@@ -13,6 +13,8 @@ namespace BearUI
 	public:
 		void PushItem(BearUIItem*item);
 		void PushItem(BearUIStaticItem*item);
+		void PushItemInBegin(BearUIItem*item);
+		void PushItemInBegin(BearUIStaticItem*item);
 		void PopItem(BearUIItem*item);
 		void PopItem(BearUIStaticItem*item);
 		void PopItems();

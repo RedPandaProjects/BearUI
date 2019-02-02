@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::BearUITexture::BearUITexture():Color(BearCore::BearColor::White)
+BearUI::BearUITexture::BearUITexture():Color(BearCore::BearColor::White), TextureUV(0,0,1,1)
 {
 	Texture = BearGraphics::BearDefaultManager::GetTexture2D();
 }

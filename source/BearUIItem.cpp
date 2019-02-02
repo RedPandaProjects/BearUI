@@ -20,6 +20,18 @@ void BearUI::BearUIItem::PushItem(BearUIStaticItem * item)
 	m_static_items.push_back(item);
 }
 
+void BearUI::BearUIItem::PushItemInBegin(BearUIItem * item)
+{
+	item->Reset();
+	m_items.insert(m_items.begin(),item);
+}
+
+void BearUI::BearUIItem::PushItemInBegin(BearUIStaticItem * item)
+{
+	item->Reset();
+	m_static_items.insert(m_static_items.begin(), item);
+}
+
 void BearUI::BearUIItem::PopItem(BearUIItem * item)
 {
 	{
