@@ -151,11 +151,11 @@ void BearUI::BearUIButton::Reset()
 
 	if (StyleConfig.ShowBackground)
 	{
-		Style.and(~B_WithoutBackground);
+		Style.AND(~B_WithoutBackground);
 	}
 	else
 	{
-		Style.or(B_WithoutBackground);
+		Style.OR(B_WithoutBackground);
 	}
 
 	if (Style.test(B_WithoutBackground))

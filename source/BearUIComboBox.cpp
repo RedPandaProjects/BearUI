@@ -9,7 +9,7 @@ BearUI::BearUIComboBox::BearUIComboBox() :SelectItem(-1), CallBack(0)
 	PushItem(&UIListBox);
 	UIListBox.SetCallback(this, &BearUIComboBox::CBListBox);
 	UIButton.SetCallback(this, &BearUIComboBox::CBButton);
-	Flags. or (UI_NoMouseEnter);
+	Flags. OR (UI_NoMouseEnter);
 }
 
 BearUI::BearUIComboBox::~BearUIComboBox()
@@ -72,7 +72,7 @@ void BearUI::BearUIComboBox::Reset()
 	UIText.Size.x -= size + 4;
 	UIText.Rect += BearCore::BearVector4<float>(1, 1, -2, -2);
 	UIText.Clip = UIText.Rect;
-	UIText.Flags. and (~UIFlags::UI_NoClip);
+	UIText.Flags. AND (~UIFlags::UI_NoClip);
 	UIText.Font = Font;
 	UIText.Text = TEXT("");
 	if (static_cast<bint>(Items.size()) < SelectItem)
