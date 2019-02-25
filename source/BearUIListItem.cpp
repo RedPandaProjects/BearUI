@@ -4,7 +4,7 @@ BearUI::BearUIListItem::BearUIListItem():ID(0), CallBack(0)
 {
 	Color = BearCore::BearColor::Transparent;
 	ColorSelected = BearCore::BearColor(uint8(0), uint8(151), uint8(251));
-	Flags. and (~UIFlags::UI_NoClip);
+	Flags. AND (~UIFlags::UI_NoClip);
 	PushItem(&UIText);
 	PushItem(&UITexture);
 	UIText.Flags = UITexture.Flags = Flags;

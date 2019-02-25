@@ -73,7 +73,7 @@ void BearUI::BearUIScrollBar::Reset()
 
 
 
-	UIButton.Flags.or( UIButton.B_CallBackPress);
+	UIButton.Flags.OR( UIButton.B_CallBackPress);
 	UIButton.StyleConfig = BearUIButton::StyleWithoutBackground();
 
 	UIBackground.Color = ColorBackground;
