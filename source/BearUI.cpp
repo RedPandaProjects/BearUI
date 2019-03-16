@@ -226,7 +226,7 @@ void BearUI::BearUI::Render(BearUITexture * texture)
 
 	if (texture->Flags.test(BearUIStaticItem::UI_NoClip))
 	{
-		BearGraphics::BearRenderInterface::SetScissor( 0, 0, static_cast<float>(m_size_screen.x), static_cast<float>(m_size_screen.y));
+		BearGraphics::BearRenderInterface::DisableScissor( );
 	}
 	else
 	{
@@ -243,6 +243,7 @@ void BearUI::BearUI::Render(BearUITexture * texture)
 	BearGraphics::BearRenderInterface::SetVertexBuffer(m_vertex_buffer);
 	BearGraphics::BearRenderInterface::SetIndexBuffer(m_index_buffer);
 	BearGraphics::BearRenderInterface::Draw(6);
+	BearGraphics::BearRenderInterface::DisableScissor();
 }
 
 void BearUI::BearUI::Render(BearUIText * text)
@@ -259,7 +260,7 @@ void BearUI::BearUI::Render(BearUIText * text)
 
 	if (text->Flags.test(BearUIStaticItem::UI_NoClip))
 	{
-		BearGraphics::BearRenderInterface::SetScissor(0, 0, static_cast<float>(m_size_screen.x), static_cast<float>(m_size_screen.y));
+		BearGraphics::BearRenderInterface::DisableScissor();
 	}
 	else
 	{
@@ -335,6 +336,7 @@ void BearUI::BearUI::Render(BearUIText * text)
 		}
 
 	}
+	BearGraphics::BearRenderInterface::DisableScissor();
 }
 
 void BearUI::BearUI::UpdateFocus()

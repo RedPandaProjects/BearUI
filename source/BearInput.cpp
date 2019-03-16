@@ -117,8 +117,9 @@ struct Initializer
 	{
 
 	}
-
+	 
 };
+Initializer Initializer;
 #endif
 bool BearUI::BearInput::KeyState(Key key)
 {

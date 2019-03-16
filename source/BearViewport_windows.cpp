@@ -99,19 +99,19 @@ BearUI::BearViewport::BearViewport(bsize width, bsize height, bool fullscreen, B
 
 
 
-	DWORD Style = WS_POPUP;
-	if (!flags.test(TW_POPUP))Style = WS_OVERLAPPED | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	DWORD Style = WS_POPUP ;
+	if (!flags.test(TW_POPUP))Style = WS_OVERLAPPED | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_DLGFRAME;
 
 	{
 		RECT rectangle = { 0, 0, static_cast<long>(width), static_cast<long>(height) };
 
 		if (!flags.test(TW_WIHTOUT_CLOSED))
 		{
-			m_window = CreateWindow(TEXT("BEAR"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
+			m_window = CreateWindowEx(WS_EX_TOPMOST, TEXT("BEAR"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
 		}
 		else
 		{
-			m_window = CreateWindow(TEXT("BEARNC"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
+			m_window = CreateWindowEx(WS_EX_TOPMOST, TEXT("BEARNC"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
 		}
 
 		AdjustWindowRect(&rectangle, GetWindowLong((HWND)m_window, GWL_STYLE), false);
@@ -200,11 +200,17 @@ bool BearUI::BearViewport::Update()
 
 BearCore::BearVector2<float> BearUI::BearViewport::GetMousePosition()
 {
-	return BearCore::BearVector2<float>();
+	POINT point;
+	GetCursorPos(&point);
+	ScreenToClient(GetWindowHandle(), &point);
+	return BearCore::BearFVector2(static_cast<float>(point.x), static_cast<float>(point.y));
 }
 
 void BearUI::BearViewport::SetMousePosition(const BearCore::BearVector2<float>& position)
 {
+	POINT point = { static_cast<LONG>(position.x),static_cast<LONG>(position.y) };
+	ClientToScreen(GetWindowHandle(), &point);
+	SetCursorPos(point.x, point.y);
 }
 
 void BearUI::BearViewport::SetVsync(bool vsync)

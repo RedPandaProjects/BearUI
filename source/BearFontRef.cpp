@@ -184,8 +184,8 @@ bool BearUI::BearFontRef::LoadFromTTF(const bchar * file, const bchar16 * chars,
 	}
 
 	FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-	FT_Set_Char_Size(face, 0, size * 64, width, height);
-	FT_Set_Pixel_Sizes(face, 0, size);;
+	FT_Set_Char_Size(face, 0,static_cast<FT_F26Dot6>( size * 64),static_cast<FT_UInt>( width), static_cast<FT_UInt>(height));
+	FT_Set_Pixel_Sizes(face, 0, static_cast<FT_UInt>(size));;
 	bsize chars_size = BearCore::BearString::GetSize(chars) + 1;
 
 	uint32 x_t = 0, y_t = 0;

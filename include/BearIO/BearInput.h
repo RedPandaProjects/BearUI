@@ -2,12 +2,12 @@
 namespace BearUI
 {
 
-	class BearInput
+	class BEARUI_API BearInput
 	{
 		BEAR_CLASS_STATIC(BearInput);
 	public:
 		enum Key
-		{
+		{ 
 #define KEY(A) Key##A,
 #include "..\BearIO\BearKeys.h"
 			Key_Count,
