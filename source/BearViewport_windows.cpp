@@ -91,7 +91,7 @@ static void RegisterWindowsClass(HINSTANCE hInstance,bool closed)
 	wc.cbSize = sizeof(WNDCLASSEX);
 	RegisterClassEx(&wc);
 }
-BearUI::BearViewport::BearViewport(bsize width, bsize height, bool fullscreen, BearCore::BearFlags<int32> flags):m_width(width),m_height(height), m_mouse_enter(false)
+BearUI::BearViewport::BearViewport(bsize width, bsize height, bool fullscreen, BearCore::BearFlags<int32> flags):m_width(width),m_height(height), m_mouse_enter(false), m_fullscreen(false)
 {
 	m_events_item = m_events.end();
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
