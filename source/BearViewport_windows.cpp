@@ -78,7 +78,11 @@ static void RegisterWindowsClass(HINSTANCE hInstance,bool closed)
 	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 	wc.hIconSm = wc.hIcon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+#ifdef DEBUG
 	wc.hbrBackground = CreateSolidBrush(RGB(69, 22, 28));
+#else
+	wc.hbrBackground =  (HBRUSH)GetStockObject(BLACK_BRUSH);
+#endif
 	wc.lpszMenuName = NULL;
 	if (closed)
 	{
