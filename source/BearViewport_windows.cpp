@@ -111,11 +111,11 @@ BearUI::BearViewport::BearViewport(bsize width, bsize height, bool fullscreen, B
 
 		if (!flags.test(TW_WIHTOUT_CLOSED))
 		{
-			m_window = CreateWindowEx(WS_EX_TOPMOST, TEXT("BEAR"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
+			m_window = CreateWindowEx(0, TEXT("BEAR"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
 		}
 		else
 		{
-			m_window = CreateWindowEx(WS_EX_TOPMOST, TEXT("BEARNC"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
+			m_window = CreateWindowEx(0, TEXT("BEARNC"), TEXT(""), Style, 0, 0, 1, 1, NULL, NULL, hInstance, this);
 		}
 
 		AdjustWindowRect(&rectangle, GetWindowLong((HWND)m_window, GWL_STYLE), false);
