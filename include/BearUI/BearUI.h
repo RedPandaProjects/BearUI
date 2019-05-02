@@ -43,9 +43,9 @@ namespace BearUI
 
 
 		BearGraphics::BearShaderConstantsRef m_color_constant;
-		BearGraphics::BearShaderConstantsRef m_matrix_constant;
+		BearGraphics::BearShaderConstantsRef m_screen_constant;
 
-		BearCore::BearMatrix m_matrix;
+		BearCore::BearVector4<float> m_screen;
 		BearGraphics::BearVertexBufferRef m_vertex_buffer;
 		BearGraphics::BearIndexBufferRef m_index_buffer;
 	

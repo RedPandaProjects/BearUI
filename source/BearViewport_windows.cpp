@@ -151,17 +151,23 @@ void BearUI::BearViewport::Resize(bsize width, bsize height)
 	{
 		uint32 xpos = static_cast<int32>(((uint32)GetSystemMetrics(SM_CXSCREEN) / 2) - (m_width / 2));
 		uint32 ypos = static_cast<int32>(((uint32)GetSystemMetrics(SM_CYSCREEN) / 2) - (m_height / 2));
-
-		RECT rectangle = { 0, 0, static_cast<long>(m_width), static_cast<long>(m_height) };
+		SetWindowLong((HWND)m_window, GWL_STYLE, WS_BORDER | WS_VISIBLE| WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX);
+		RECT rectangle = { xpos, ypos, static_cast<long>(m_width), static_cast<long>(m_height) };
 		AdjustWindowRect(&rectangle, GetWindowLong((HWND)m_window, GWL_STYLE), false);
 		long w = rectangle.right - rectangle.left;
 		long h = rectangle.bottom - rectangle.top;
-		SetWindowPos((HWND)m_window, NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER);
-		SetWindowPos((HWND)m_window, NULL, xpos, ypos, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		
+		SetWindowPos((HWND)m_window, HWND_NOTOPMOST,  rectangle.left, rectangle.top, rectangle.right, rectangle.bottom, SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+		SetForegroundWindow((HWND)m_window);
 	}
 	else
 	{
-		SetWindowPos((HWND)m_window, HWND_TOP, 0, 0, static_cast<int32>(m_width), static_cast<int32>(m_height), SWP_FRAMECHANGED);
+	/*	SetWindowPos((HWND)m_window, HWND_TOP, 0, 0, static_cast<int32>(m_width), static_cast<int32>(m_height), SWP_FRAMECHANGED);
+		SetWindowLong((HWND)m_window, GWL_STYLE, WS_EX_TOPMOST | WS_POPUP | WS_VISIBLE);
+		ShowWindow((HWND)m_window, SW_MAXIMIZE);
+		SetWindowLong(m_window, GWL_EXSTYLE, WS_EX_TOPMOST);
+
+		SetForegroundWindow(m_window);*/
 	}
 	BearGraphics::BearViewport::Resize(width, height);
 
@@ -170,17 +176,20 @@ void BearUI::BearViewport::Resize(bsize width, bsize height)
 void BearUI::BearViewport::SetFullScreen(bool fullscreen)
 {
 	m_fullscreen = fullscreen;
+	
 	if (m_fullscreen)
 	{
-		SetWindowLong((HWND)m_window, GWL_STYLE, WS_EX_TOPMOST | WS_POPUP | WS_VISIBLE);
-		ShowWindow((HWND)m_window, SW_MAXIMIZE);
-		Resize(m_width, m_height);
+		SetWindowLong((HWND)m_window, GWL_STYLE,WS_POPUP | WS_VISIBLE);
+//		SetWindowLong((HWND)m_window, GWL_EXSTYLE, WS_EX_TOPMOST);
+	
 	}
 	else
 	{
-		SetWindowLong((HWND)m_window, GWL_STYLE, WS_VISIBLE | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU);
-		ShowWindow((HWND)m_window, SW_SHOW);
+		//SetWindowLong((HWND)m_window, GWL_STYLE, WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX);
+		Resize(m_width, m_height);
+
 	}
+	SetForegroundWindow((HWND)m_window);
 	BearGraphics::BearViewport::SetFullScreen(fullscreen);
 }
 
@@ -206,13 +215,14 @@ BearCore::BearVector2<float> BearUI::BearViewport::GetMousePosition()
 {
 	POINT point;
 	GetCursorPos(&point);
-	ScreenToClient(GetWindowHandle(), &point);
+	if(!IsFullScreen())	ScreenToClient(GetWindowHandle(), &point);
 	return BearCore::BearFVector2(static_cast<float>(point.x), static_cast<float>(point.y));
 }
 
 void BearUI::BearViewport::SetMousePosition(const BearCore::BearVector2<float>& position)
 {
 	POINT point = { static_cast<LONG>(position.x),static_cast<LONG>(position.y) };
+	if (!IsFullScreen())	
 	ClientToScreen(GetWindowHandle(), &point);
 	SetCursorPos(point.x, point.y);
 }

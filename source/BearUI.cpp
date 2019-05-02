@@ -7,12 +7,13 @@ BearCore::BearMap<int32, int32>* GWindowsKeys;
 BearUI::BearUI::BearUI(bsize width, bsize height):m_focus_item(0)
 {
 	BearGraphics::BearShaderConstantsInitializer sconst_othro;
-	sconst_othro.Constants.push_back(BearGraphics::CF_MATRIX);
-	m_matrix_constant = BearGraphics::BearShaderConstantsRef(sconst_othro, true);
+	sconst_othro.Constants.push_back(BearGraphics::CF_R32G32B32A32_FLOAT);
+	m_screen_constant = BearGraphics::BearShaderConstantsRef(sconst_othro, true);
 
-	m_matrix.BuildOrthoOffCenter(static_cast<float>(width), static_cast<float>(height), FLT_MIN, 100.f);
-	BearCore::bear_copy(m_matrix_constant.Lock(), *m_matrix, sizeof(float) * 16);
-	m_matrix_constant.Unlock();
+	m_screen.set(static_cast<float>(width), static_cast<float>(height), 1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
+
+	BearCore::bear_copy(m_screen_constant.Lock(), m_screen.array, sizeof(float) * 4);
+	m_screen_constant.Unlock();
 
 	BearGraphics::BearShaderConstantsInitializer sconst_color;
 	sconst_color.Constants.push_back(BearGraphics::CF_R32G32B32A32_FLOAT);
@@ -29,7 +30,7 @@ BearUI::BearUI::BearUI(bsize width, bsize height):m_focus_item(0)
 BearUI::BearUI::~BearUI()
 {
 	m_color_constant.Clear();
-	m_matrix_constant.Clear();
+	m_screen_constant.Clear();
 	m_vertex_buffer.Clear();
 	m_index_buffer.Clear();
 #ifdef WINDOWS
@@ -79,9 +80,10 @@ BearUI::BearUIStaticItem * BearUI::BearUI::PushItem(BearUIStaticItem * item)
 
 void BearUI::BearUI::Resize(bsize width, bsize height)
 {
-	m_matrix.BuildOrthoOffCenter(static_cast<float>(width), static_cast<float>(height), FLT_MIN, 100.f);
-	BearCore::bear_copy(m_matrix_constant.Lock(), *m_matrix, sizeof(float) * 16);
-	m_matrix_constant.Unlock();
+	m_screen.set(static_cast<float>(width), static_cast<float>(height), 1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
+
+	BearCore::bear_copy(m_screen_constant.Lock(), m_screen.array, sizeof(float) * 4);
+	m_screen_constant.Unlock();
 	m_size_screen.set(width, height);
 	Reset();
 }
@@ -89,9 +91,11 @@ void BearUI::BearUI::Resize(bsize width, bsize height)
 
 void BearUI::BearUI::Draw(float time)
 {
-	BearGraphics::BearRenderInterface::SetBlendState(BearGraphics::BearDefaultManager::GetBlendAlpha(), BearCore::BearColor::Transparent);
+
+
+	BearGraphics::BearRenderInterface::SetVertexState(BearGraphics::BearDefaultManager::GetVertexState(BearGraphics::DVS_UI));
 	BearGraphics::BearRenderInterface::SetRasterizerState(BearGraphics::BearDefaultManager::GetRasterizerState());
-	BearGraphics::BearRenderInterface::SetVertexState(BearGraphics::BearDefaultManager::GetVertexState());
+	BearGraphics::BearRenderInterface::SetBlendState(BearGraphics::BearDefaultManager::GetBlendAlpha(), BearCore::BearColor::Transparent);
 	{
 		auto b = m_items.rbegin();
 		auto e = m_items.rend();
@@ -220,9 +224,9 @@ void BearUI::BearUI::OnKeyUp(BearInput::Key key)
 void BearUI::BearUI::Render(BearUITexture * texture)
 {
     BearGraphics::BearRenderInterface::SetPixelShader(BearGraphics::BearDefaultManager::GetPixelShader(BearGraphics::DPS_UITexture));
-	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_Default));
+	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_UI));
 
-	BearGraphics::BearRenderInterface::SetVertexShaderConstants(0, m_matrix_constant);
+	BearGraphics::BearRenderInterface::SetVertexShaderConstants(0, m_screen_constant);
 
 	if (texture->Flags.test(BearUIStaticItem::UI_NoClip))
 	{
@@ -254,9 +258,9 @@ void BearUI::BearUI::Render(BearUIText * text)
 	if (text->Font.Empty() || !size)return;
 
 	BearGraphics::BearRenderInterface::SetPixelShader(BearGraphics::BearDefaultManager::GetPixelShader(BearGraphics::DPS_UIText));
-	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_Default));
+	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_UI));
 
-	BearGraphics::BearRenderInterface::SetVertexShaderConstants(0, m_matrix_constant);
+	BearGraphics::BearRenderInterface::SetVertexShaderConstants(0, m_screen_constant);
 
 	if (text->Flags.test(BearUIStaticItem::UI_NoClip))
 	{
@@ -316,10 +320,10 @@ void BearUI::BearUI::Render(BearUIText * text)
 					float width = item->second.Size.x;
 					float height = item->second.Size.y;
 
-					vertex[0].Position.set(x, y + height,0);
-					vertex[1].Position.set(x + width, y,0);
-					vertex[2].Position.set(x, y,0);
-					vertex[3].Position.set(x + width, y + height,0);
+					vertex[0].Position.set(x, y + height);
+					vertex[1].Position.set(x + width, y);
+					vertex[2].Position.set(x, y);
+					vertex[3].Position.set(x + width, y + height);
 					vertex[0].TextureUV.set(TextureUV.x, TextureUV.y + TextureUV.y1);
 					vertex[1].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y);
 					vertex[2].TextureUV.set(TextureUV.x, TextureUV.y);

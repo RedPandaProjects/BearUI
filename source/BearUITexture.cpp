@@ -12,10 +12,10 @@ BearUI::BearUITexture::~BearUITexture()
 void BearUI::BearUITexture::Draw(BearUI * ui, float time)
 {
 	if (Visible)return;
-	m_vertex[0].Position.set(Position.x, Position.y + Size.y, 0);
-	m_vertex[1].Position.set(Position.x + Size.x, Position.y, 0);
-	m_vertex[2].Position.set(Position.x, Position.y, 0);
-	m_vertex[3].Position.set(Position.x + Size.x, Position.y + Size.y, 0);
+	m_vertex[0].Position.set(Position.x, Position.y + Size.y);
+	m_vertex[1].Position.set(Position.x + Size.x, Position.y);
+	m_vertex[2].Position.set(Position.x, Position.y);
+	m_vertex[3].Position.set(Position.x + Size.x, Position.y + Size.y);
 	m_vertex[0].TextureUV.set(TextureUV.x, TextureUV.y1);
 	m_vertex[1].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y + TextureUV.y);
 	m_vertex[2].TextureUV.set(TextureUV.x, TextureUV.y);
