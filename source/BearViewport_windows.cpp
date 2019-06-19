@@ -152,10 +152,9 @@ void BearUI::BearViewport::Resize(bsize width, bsize height)
 		uint32 xpos = static_cast<int32>(((uint32)GetSystemMetrics(SM_CXSCREEN) / 2) - (m_width / 2));
 		uint32 ypos = static_cast<int32>(((uint32)GetSystemMetrics(SM_CYSCREEN) / 2) - (m_height / 2));
 		SetWindowLong((HWND)m_window, GWL_STYLE, WS_BORDER | WS_VISIBLE| WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX);
-		RECT rectangle = { xpos, ypos, static_cast<long>(m_width), static_cast<long>(m_height) };
+		RECT rectangle = { static_cast<long>(xpos),  static_cast<long>(ypos), static_cast<long>(m_width), static_cast<long>(m_height) };
 		AdjustWindowRect(&rectangle, GetWindowLong((HWND)m_window, GWL_STYLE), false);
-		long w = rectangle.right - rectangle.left;
-		long h = rectangle.bottom - rectangle.top;
+
 		
 		SetWindowPos((HWND)m_window, HWND_NOTOPMOST,  rectangle.left, rectangle.top, rectangle.right, rectangle.bottom, SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
 		SetForegroundWindow((HWND)m_window);
@@ -180,7 +179,7 @@ void BearUI::BearViewport::SetFullScreen(bool fullscreen)
 	if (m_fullscreen)
 	{
 		SetWindowLong((HWND)m_window, GWL_STYLE,WS_POPUP | WS_VISIBLE);
-//		SetWindowLong((HWND)m_window, GWL_EXSTYLE, WS_EX_TOPMOST);
+		SetWindowLong((HWND)m_window, GWL_EXSTYLE, WS_EX_TOPMOST);
 	
 	}
 	else
