@@ -1,7 +1,9 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIComboBox::BearUIComboBox() :SelectItem(-1), CallBack(0)
+BearUI::Classic::BearUIComboBox::BearUIComboBox() :SelectItem(-1), CallBack(0)
 {
+	ColorPlaneBackground.Set(uint8(100), uint8(100), uint8(100));
+	ColorPlane.Set(uint8(20), uint8(20), uint8(20));
 	PushItem(&UIButton);
 	PushItem(&UIText);
 	PushItem(&UITexture);
@@ -12,44 +14,30 @@ BearUI::BearUIComboBox::BearUIComboBox() :SelectItem(-1), CallBack(0)
 	Flags. OR (UI_NoMouseEnter);
 }
 
-BearUI::BearUIComboBox::~BearUIComboBox()
+BearUI::Classic::BearUIComboBox::~BearUIComboBox()
 {
 	if (CallBack)CallBack->Destroy();
 }
 
-void BearUI::BearUIComboBox::OnMessage(int32 message)
+void BearUI::Classic::BearUIComboBox::OnMessage(int32 message)
 {
 	switch (message)
 	{
-	case MCB_SelectItem:
+	case M_SelectItem:
 		if (CallBack)CallBack->Call<void>(CallBack_Class);
 		break;
 	}
+	BearUIItem::OnMessage(message);
 }
 
-bool BearUI::BearUIComboBox::OnMouse(float x, float y)
+void BearUI::Classic::BearUIComboBox::Reset()
 {
-	return BearUIItem::OnMouse(x,y);;
-}
-
-bool BearUI::BearUIComboBox::OnKeyDown(BearInput::Key key)
-{
-	return BearUIItem::OnKeyDown(key);;
-}
-
-bool BearUI::BearUIComboBox::OnKeyUp(BearInput::Key key)
-{
-	return BearUIItem::OnKeyUp(key);
-}
-
-void BearUI::BearUIComboBox::Reset()
-{
-	float size = static_cast<float>(Font.GetHieght())+2;
+	float size = static_cast<float>(Font.GetMaxHieght())+2;
 	UIButton.Size.set(size + 4, size + 4);
 	UIButton.Position.set(Position.x+ (Size.x-(size +4)), Position.y);
-	UIButton.Font = Font;
-	UIButton.Text = TEXT("V");
-	UIButton.StyleConfig = BearUIButton::StyleWithoutBackground();
+	UIButton.Style.set(true, UIButton.S_Triangle);
+	UIButton.TriangleStyle = BearUITriangle::S_TriangleDown;
+	UIButton.StyleConfig = BearUIButton::StyleWithoutBackgroundDark();
 	UIButton.Rect += BearCore::BearVector4<float>(1, 1, -2, -2);
 
 
@@ -58,8 +46,8 @@ void BearUI::BearUIComboBox::Reset()
 	
 	UITexture.Rect = UITextureBackground.Rect;
 	UITexture.Rect += BearCore::BearVector4<float>(1, 1, -2, -2);
-	UITexture.Color = UIButton.StyleConfig.Colors[UIButton.StyleConfig.A_Default][UIButton.StyleConfig.CT_Plane];
-	UITextureBackground.Color = UIButton.StyleConfig.Colors[UIButton.StyleConfig.A_MouseEnter][UIButton.StyleConfig.CT_Plane];
+	UITexture.Color = ColorPlane;
+	UITextureBackground.Color = ColorPlaneBackground;
 
 	UIListBox.Position.set(Position.x,Position.y + size + 4);
 	UIListBox.Size.set(Size.x, Size.y - size - 4);
@@ -72,7 +60,7 @@ void BearUI::BearUIComboBox::Reset()
 	UIText.Size.x -= size + 4;
 	UIText.Rect += BearCore::BearVector4<float>(1, 1, -2, -2);
 	UIText.Clip = UIText.Rect;
-	UIText.Flags. AND (~UIFlags::UI_NoClip);
+	UIText.Flags. AND (~UI_NoClip);
 	UIText.Font = Font;
 	UIText.Text = TEXT("");
 	if (static_cast<bint>(Items.size()) < SelectItem)
@@ -88,43 +76,22 @@ void BearUI::BearUIComboBox::Reset()
 	BearUIItem::Reset();
 }
 
-void BearUI::BearUIComboBox::Update()
-{
-	BearUIItem::Update();
-}
-
-void BearUI::BearUIComboBox::Draw(BearUI * ui, float time)
-{
-	BearUIItem::Draw(ui,time);
-}
-
-void BearUI::BearUIComboBox::Unload()
-{
-	BearUIItem::Unload();
-}
-
-void BearUI::BearUIComboBox::Reload()
-{
-	BearUIItem::Reload();
-
-}
-
-void BearUI::BearUIComboBox::KillFocus()
+void BearUI::Classic::BearUIComboBox::KillFocus()
 {
 	UIListBox.Visible = true;
 	BearUIItem::KillFocus();
 }
 
-void BearUI::BearUIComboBox::CBButton()
+void BearUI::Classic::BearUIComboBox::CBButton()
 {
 	UIListBox.Visible = false;
 }
 
-void BearUI::BearUIComboBox::CBListBox()
+void BearUI::Classic::BearUIComboBox::CBListBox()
 {
 	UIListBox.Visible = true;
 	SelectItem = UIListBox.SelectItem;
 	UIText.Text = Items[SelectItem];
 	UIText.Reset();
-	OnMessage(MCB_SelectItem);
+	OnMessage(M_SelectItem);
 }

@@ -33,7 +33,7 @@ namespace BearUI
 		{
 			BearCore::BearFVector2 Size;
 			BearCore::BearVector4<float> TextureUV;
-			float Advance;
+			BearCore::BearFVector2 Advance;
 			BearCore::BearFVector2 Position;
 		};
 		inline const BearGraphics::BearTexture2DRef*GetTexture() const
@@ -46,6 +46,11 @@ namespace BearUI
 			if (m_data.empty())return 0;
 			return m_data.get()->m_size;
 		}
+		inline bsize GetMaxHieght()const
+		{
+			if (m_data.empty())return 0;
+			return m_data.get()->m_max_hieght;
+		}
 		inline const BearCore::BearMap<bchar16, CharInfo>*GetListChars()const
 		{
 			if (m_data.empty())return 0;
@@ -54,10 +59,11 @@ namespace BearUI
 	private:
 		struct data
 		{
-			data() :m_size(0) {}
+			data() :m_size(0) , m_max_hieght(0){}
 			~data() {}
 			BearCore::BearMap<bchar16, CharInfo>  m_chars_info;
 			bsize m_size;
+			bsize m_max_hieght;
 			BearGraphics::BearImage m_image;
 			BearGraphics::BearTexture2DRef m_texture;
 		};

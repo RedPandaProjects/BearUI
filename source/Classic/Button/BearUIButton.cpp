@@ -1,33 +1,24 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIButton::BearUIButton():CallBack(0),CallBack_Class(0), bPress(false)
+BearUI::Classic::BearUIButton::BearUIButton():CallBack(0),CallBack_Class(0), bPress(false), TriangleStyle(BearUITriangle::S_TriangleRight)
 {
 	UIText.Style = UIText.ST_CenterOfHeight|UIText.ST_CenterOfWidth;
 	PushItem(&UIText);
+	PushItem(&UITriangle);
 	PushItem(&UITexture);
 	PushItem(&UITextureBack);
+	UITriangle.Visible = true;
 }
 
-BearUI::BearUIButton::~BearUIButton()
+BearUI::Classic::BearUIButton::~BearUIButton()
 {
 	if (CallBack)CallBack->Destroy();
 	CallBack = 0;
 	CallBack_Class = 0;
 }
-/*
-inline void BearUI::BearUIButton::ClearCallBack()
-{
-	if (CallBack)CallBack->Destroy();
-	CallBack = 0;
-	CallBack_Class = 0;
-}*/
 
-void BearUI::BearUIButton::Draw(BearUI * ui, float time)
-{
-	BearUIItem::Draw(ui, time);
-}
 
-void BearUI::BearUIButton::Update()
+void BearUI::Classic::BearUIButton::Update()
 {
 	BearUIItem::Update();
 	if (bPress)
@@ -35,7 +26,7 @@ void BearUI::BearUIButton::Update()
 		if (CallBack)CallBack->Call<void>(CallBack_Class);
 	}
 	UIText.Position = Position;
-	if (Style.test(B_WithoutBackground))
+	if (Style.test(S_WithoutBackground))
 	{
 		UITexture.Position = Position;
 	}
@@ -44,13 +35,14 @@ void BearUI::BearUIButton::Update()
 		UITexture.Position = Position + BearCore::BearVector2<float>(2, 2);
 	}
 	UITextureBack.Position = Position;
+	UITriangle.Position = Position;
 }
 
-void BearUI::BearUIButton::OnMessage(int32 message)
+void BearUI::Classic::BearUIButton::OnMessage(int32 message)
 {
 	if (Enable)
 	{
-		if (Style.test(B_WithoutBackground))
+		if (Style.test(S_WithoutBackground))
 		{
 			switch (message)
 			{
@@ -94,7 +86,7 @@ void BearUI::BearUIButton::OnMessage(int32 message)
 				break;
 			}
 		}
-		if (Flags.test(B_CallBackPress))
+		if (Flags.test(F_CallBackPress))
 		{
 			switch (message)
 			{
@@ -121,27 +113,29 @@ void BearUI::BearUIButton::OnMessage(int32 message)
 		}
 		
 	}
+	
+	BearUIItem::OnMessage(message);
 }
 
-bool BearUI::BearUIButton::OnMouse(float x, float y)
+bool BearUI::Classic::BearUIButton::OnMouse(float x, float y)
 {
 	if (bPress)return true;
 	return BearUIItem::OnMouse(x,y);
 }
 
-bool BearUI::BearUIButton::OnKeyDown(BearInput::Key key)
+bool BearUI::Classic::BearUIButton::OnKeyDown(BearInput::Key key)
 {
 	if (bPress)return true;
 	return BearUIItem::OnKeyDown(key);
 }
 
-bool BearUI::BearUIButton::OnKeyUp(BearInput::Key key)
+bool BearUI::Classic::BearUIButton::OnKeyUp(BearInput::Key key)
 {
 	if (key == BearInput::KeyMouseLeft)bPress = false;
 	return BearUIItem::OnKeyUp(key);
 }
 
-void BearUI::BearUIButton::Reset()
+void BearUI::Classic::BearUIButton::Reset()
 {
 	UIText.Rect = Rect;
 	UIText.Text = Text;
@@ -151,14 +145,14 @@ void BearUI::BearUIButton::Reset()
 
 	if (StyleConfig.ShowBackground)
 	{
-		Style.AND(~B_WithoutBackground);
+		Style.AND(~S_WithoutBackground);
 	}
 	else
 	{
-		Style.OR(B_WithoutBackground);
+		Style.OR(S_WithoutBackground);
 	}
 
-	if (Style.test(B_WithoutBackground))
+	if (Style.test(S_WithoutBackground))
 	{
 		UITextureBack.Visible = true;
 		if(Enable)
@@ -183,20 +177,17 @@ void BearUI::BearUIButton::Reset()
 		else
 			UITextureBack.Color = StyleConfig.Colors[StyleConfig.A_Disable][StyleConfig.CT_Background];
 	}
+	UITriangle.Visible = !Style.test(EStyle::S_Triangle);
+	UITriangle.Rect = Rect;
+	UITriangle.Style.clear();
+	UITriangle.Scale = 0.5f;
+	UITriangle.Style.set(true, TriangleStyle);
+	UIText.Visible = Style.test(EStyle::S_Triangle);
 	BearUIItem::Reset();
 }
 
-void BearUI::BearUIButton::Unload()
-{
-	BearUIItem::Unload();
-}
 
-void BearUI::BearUIButton::Reload()
-{
-	BearUIItem::Reload();
-}
-
-void BearUI::BearUIButton::KillFocus()
+void BearUI::Classic::BearUIButton::KillFocus()
 {
 	bPress = false;
 	BearUIItem::KillFocus();

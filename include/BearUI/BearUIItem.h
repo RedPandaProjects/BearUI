@@ -9,7 +9,7 @@ namespace BearUI
 		~BearUIItem();
 	public:
 		bool Enable;
-		bool Focus;
+	
 	public:
 		void PushItem(BearUIItem*item);
 		void PushItem(BearUIStaticItem*item);
@@ -18,17 +18,17 @@ namespace BearUI
 		void PopItem(BearUIItem*item);
 		void PopItem(BearUIStaticItem*item);
 		void PopItems();
-
+		inline bool Focused()const { return Focus; }
 		virtual void Draw(BearUI * ui ,float time);
 		virtual void Update();
-		enum Message
+		enum EMessage
 		{
 			M_MouseLevae,
 			M_MouseEnter,
 			M_MouseLClick,
 			M_MouseRClick,
 			M_MouseLUp,
-			M_MouseRUP,
+			M_MouseRUp,
 		};
 		virtual void OnMessage(int32 message);
 		virtual bool OnMouse(float x, float y);
@@ -38,9 +38,13 @@ namespace BearUI
 		virtual void KillFocus();
 		virtual void Unload();
 		virtual void Reload();
+		virtual bool OnChar(bchar16 ch);
+		bool MouseEntered();
+		inline BearCore::BearVector2<float> GetMouseLastPosition() {return MouseLastPosition;}
 	private:
+		BearCore::BearVector2<float> MouseLastPosition;
 		void UpdateFocus();
-
+		bool Focus;
 		BearCore::BearVector<BearUIStaticItem*> m_static_items;
 		BearCore::BearVector<BearUIItem*> m_items;
 		BearUIItem* m_focus_item;

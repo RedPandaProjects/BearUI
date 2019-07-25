@@ -1,64 +1,44 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIListBox::BearUIListBox(): SelectItem(-1), CallBack(0)
+BearUI::Classic::BearUIListBox::BearUIListBox(): SelectItem(-1), CallBack(0)
 {
-	ColorBackground.Set(uint8(100), uint8(100), uint8(100));
+	ColorPlaneBackground.Set(uint8(100), uint8(100), uint8(100));
+	ColorPlane.Set(uint8(20), uint8(20), uint8(20));
+	ColorSelectFocus = BearCore::BearColor(uint8(0), uint8(151), uint8(251));
+	ColorSelect.Set(uint8(67), uint8(67), uint8(67));
 	UIScrollBar.SetCallback(this,&BearUIListBox::CBScrollBar);
 }
 
-BearUI::BearUIListBox::~BearUIListBox()
+BearUI::Classic::BearUIListBox::~BearUIListBox()
 {
 	if (CallBack)CallBack->Destroy();
 }
 
-void BearUI::BearUIListBox::Draw(BearUI * ui, float time)
-{
-	return BearUIItem::Draw(ui,time);
-}
 
-void BearUI::BearUIListBox::Update()
-{
-	return BearUIItem::Update();
-}
-
-void BearUI::BearUIListBox::OnMessage(int32 message)
+void BearUI::Classic::BearUIListBox::OnMessage(int32 message)
 {
 	switch (message)
 	{
-	case LB_SelectedItem:
+	case M_SelectedItem:
 		if (CallBack)CallBack->Call<void>(CallBack_Class);
 		break;
 	}
+	BearUIItem::OnMessage(message);
 }
 
-bool BearUI::BearUIListBox::OnMouse(float x, float y)
+void BearUI::Classic::BearUIListBox::Reset()
 {
-	return BearUIItem::OnMouse(x,y);
-}
+	PopItems();
 
-bool BearUI::BearUIListBox::OnKeyDown(BearInput::Key key)
-{
-	return BearUIItem::OnKeyDown(key);
-}
-
-bool BearUI::BearUIListBox::OnKeyUp(BearInput::Key key)
-{
-	return BearUIItem::OnKeyUp(key);
-}
-
-void BearUI::BearUIListBox::Reset()
-{
-
-	UIBackground.Color = ColorBackground;
 
 	bool view_all = Items.size()*BearUIListItem::GetHieght(Font) > Rect.y1;
 
 	BearCore::BearVector2<float> size = Size;
 	if (view_all)
 	{
-		size.x -= 16;
+		size.x -=static_cast<float>( Font.GetHieght());
 		UIScrollBar.Rect = Rect;
-		UIScrollBar.Rect.x1 = 16;
+		UIScrollBar.Rect.x1 = static_cast<float>(Font.GetHieght());
 		UIScrollBar.Rect.x +=size.x;
 		UIScrollBar.Visible = false;
 		UIScrollBar.ScrollZoneView = Rect.y1/(Items.size()*BearUIListItem::GetHieght(Font)) ;
@@ -78,13 +58,6 @@ void BearUI::BearUIListBox::Reset()
 	}
 	else if (Items.size() < UIItems.size())
 	{
-		auto b = UIItems.begin()+ Items.size();
-		auto e = UIItems.end();
-		while (b != e)
-		{
-			PopItem(**b);
-			b++;
-		}
 		UIItems.resize(Items.size());
 	}
 	{
@@ -95,7 +68,6 @@ void BearUI::BearUIListBox::Reset()
 		while (b != e)
 		{
 			(*b)->ID = ID++;
-			(*b)->SetCallback(this, &BearUIListBox::CBSelectedItem);
 			PushItem(**b);
 			b++;
 		}
@@ -110,50 +82,34 @@ void BearUI::BearUIListBox::Reset()
 		UIItems[i]->Clip.set(Rect.x+2, Rect.y+2, size.x - 4, size.y - 4);
 		UIItems[i]->Font = Font;
 		UIItems[i]->Text = Items[i];
+		UIItems[i]->ColorSelect = ColorSelect;
+		UIItems[i]->ColorSelectFocus = ColorSelectFocus;
+		UIItems[i]->Parent = this;
 	}
 	PushItem(&UIScrollBar);
-	PushItem(&UIBackground);
 
-	UIBackground.Rect = Rect;
-	UIBackground.Color = ColorBackground;
+	UIPlane.Rect = Rect;
+	UIPlane.Rect += BearCore::BearVector4<float>(1, 1, -2, -2);
+	UIPlane.Color = ColorPlane;
+	PushItem(&UIPlane);
+	UIPlaneBackground.Rect = Rect;
+	UIPlaneBackground.Color = ColorPlaneBackground;
+	PushItem(&UIPlaneBackground);
+
+
 
 	BearUIItem::Reset();
 	if (SelectItem<0&&bsize(SelectItem) >= Items.size())
 		SelectItem = -1;
 	else
-		UIItems[SelectItem]->OnMessage(BearUIListItem::LI_Click);
+		UIItems[SelectItem]->OnMessage(BearUIListItem::M_Click);
+	BearUIItem::Reset();
 }
 
-void BearUI::BearUIListBox::KillFocus()
-{
-	BearUIItem::KillFocus();
-}
 
-void BearUI::BearUIListBox::Unload()
-{
-	BearUIItem::Unload();
-}
 
-void BearUI::BearUIListBox::Reload()
-{
-	BearUIItem::Reload();
-}
 
-void BearUI::BearUIListBox::CBSelectedItem(BearUIListItem * item)
-{
-	auto b = UIItems.begin();
-	auto e = UIItems.end();
-	while (b != e)
-	{
-		if(**b!=item)
-		(*b)->KillSelect();
-		b++;
-	}
-	SelectItem = item->ID;
-	OnMessage(LB_SelectedItem);
-}
-
-void BearUI::BearUIListBox::CBScrollBar()
+void BearUI::Classic::BearUIListBox::CBScrollBar()
 {
 	float var1 = BearUIListItem::GetHieght(Font)*UIItems.size()- (Rect.y1-4);
 	for (bsize i = 0; i < UIItems.size(); i++)

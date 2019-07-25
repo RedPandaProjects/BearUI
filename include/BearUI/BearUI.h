@@ -20,6 +20,8 @@ namespace BearUI
 		void OnKeyDown(BearInput::Key key);
 		void OnKeyUp(BearInput::Key key);
 
+		void OnChar(bchar16 ch);
+
 		~BearUI();
 
 		enum FontLang
@@ -38,6 +40,7 @@ namespace BearUI
 #endif
 		void Render(BearUITexture*texture);
 		void Render(BearUIText*text);
+		void Render(BearUITriangle*triangle);
 	private:
 		void UpdateFocus();
 

@@ -19,7 +19,7 @@ namespace BearUI
 			};
 		};
 		BearCore::BearVector4<float> Clip;
-		enum UIFlags
+		enum EFlags
 		{
 			UI_NoClip = 1 << 31,
 			UI_NoMouseEnter=1<<30,

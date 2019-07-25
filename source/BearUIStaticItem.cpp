@@ -6,7 +6,7 @@ BearUI::BearUIStaticItem::BearUIStaticItem():Rect(0,0,0,0), Visible(false), Clip
 
 BearUI::BearUIStaticItem::~BearUIStaticItem()
 {
-}
+} 
 
 void BearUI::BearUIStaticItem::Draw(BearUI * ui, float time)
 {

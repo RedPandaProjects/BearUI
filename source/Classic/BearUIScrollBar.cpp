@@ -1,8 +1,8 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIScrollBar::BearUIScrollBar() :ScrollZoneView(0.2f), ScrollOne(0.2f), ScrollPosition(0.f), CallBack(0)
+BearUI::Classic::BearUIScrollBar::BearUIScrollBar() :ScrollZoneView(0.2f), ScrollOne(0.2f), ScrollPosition(0.f), CallBack(0)
 {
-	ColorBackground.Set(uint8(80), uint8(80), uint8(80), uint8(255));
+	ColorBackground.Set(uint8(70), uint8(70), uint8(70), uint8(255));
 	PushItem(&UIButton);
 	PushItem(&UIButtonDown);
 	PushItem(&UIButtonUp);
@@ -12,27 +12,28 @@ BearUI::BearUIScrollBar::BearUIScrollBar() :ScrollZoneView(0.2f), ScrollOne(0.2f
 	UIButton.SetCallback(this, &BearUIScrollBar::UpdatePosition);
 }
 
-BearUI::BearUIScrollBar::~BearUIScrollBar()
+BearUI::Classic::BearUIScrollBar::~BearUIScrollBar()
 {
 	if (CallBack)CallBack->Destroy();
 }
 
-void BearUI::BearUIScrollBar::OnMessage(int32 message)
+void BearUI::Classic::BearUIScrollBar::OnMessage(int32 message)
 {
 	switch (message)
 	{
-	case MSB_ScrollUpdatePosition:
+	case M_ScrollUpdatePosition:
 		UIButton.Position.y = floorf((ScrollPosition *(Rect.y1 - 32 - UIButton.Size.y)) + 16 + Rect.y);
 		break;
-	case MSB_ScrollChange:
+	case M_ScrollChange:
 		if(CallBack)CallBack->Call<void>(CallBack_Class);
 		break;
 	default:
 		break;
 	}
+	BearUIItem::OnMessage(message);
 }
 
-bool BearUI::BearUIScrollBar::OnMouse(float x, float y)
+bool BearUI::Classic::BearUIScrollBar::OnMouse(float x, float y)
 {
 	MousePosition.set(x, y);
 	if (!UIButton.IsPress())
@@ -40,18 +41,9 @@ bool BearUI::BearUIScrollBar::OnMouse(float x, float y)
 	return BearUIItem::OnMouse(x,y);;
 }
 
-bool BearUI::BearUIScrollBar::OnKeyDown(BearInput::Key key)
-{
-	return BearUIItem::OnKeyDown(key);;
-}
 
-bool BearUI::BearUIScrollBar::OnKeyUp(BearInput::Key key)
-{
-		
-	return BearUIItem::OnKeyUp(key);;
-}
 
-void BearUI::BearUIScrollBar::Reset()
+void BearUI::Classic::BearUIScrollBar::Reset()
 {
 	UIBackground.Rect = Rect;
 	UIButton.Rect = Rect;
@@ -73,7 +65,7 @@ void BearUI::BearUIScrollBar::Reset()
 
 
 
-	UIButton.Flags.OR( UIButton.B_CallBackPress);
+	UIButton.Flags.OR( UIButton.F_CallBackPress);
 	UIButton.StyleConfig = BearUIButton::StyleWithoutBackground();
 
 	UIBackground.Color = ColorBackground;
@@ -82,32 +74,8 @@ void BearUI::BearUIScrollBar::Reset()
 	BearUIItem::Reset();
 }
 
-void BearUI::BearUIScrollBar::Update()
-{
-	BearUIItem::Update();
-}
 
-void BearUI::BearUIScrollBar::Draw(BearUI * ui, float time)
-{
-	BearUIItem::Draw(ui,time);
-}
-
-void BearUI::BearUIScrollBar::Unload()
-{
-	BearUIItem::Unload();
-}
-
-void BearUI::BearUIScrollBar::Reload()
-{
-	BearUIItem::Reload();
-}
-
-void BearUI::BearUIScrollBar::KillFocus()
-{
-	BearUIItem::KillFocus();
-}
-
-void BearUI::BearUIScrollBar::UpdatePosition()
+void BearUI::Classic::BearUIScrollBar::UpdatePosition()
 {
 	float change = MousePosition.y - StartPosition.y;
 	UIButton.Position.y += change;
@@ -117,21 +85,21 @@ void BearUI::BearUIScrollBar::UpdatePosition()
 	else if (UIButton.Position.y > Rect.y + Rect.y1- UIButtonDown.Rect.y1- UIButton.Rect.y1)
 		UIButton.Position.y = Rect.y + Rect.y1  - UIButtonDown.Rect.y1 - UIButton.Rect.y1;
 	ScrollPosition = (UIButton.Position.y - Rect.y - 16 ) / (Rect.y1 - 32- UIButton.Size.y);
-	OnMessage(MSB_ScrollChange);
+	OnMessage(M_ScrollChange);
 }
 
-void BearUI::BearUIScrollBar::AddScrollOne()
+void BearUI::Classic::BearUIScrollBar::AddScrollOne()
 {
 	ScrollPosition += ScrollOne;
 	if (ScrollPosition > 1)ScrollPosition = 1;
-	OnMessage(MSB_ScrollUpdatePosition);
-	OnMessage(MSB_ScrollChange);
+	OnMessage(M_ScrollUpdatePosition);
+	OnMessage(M_ScrollChange);
 }
 
-void BearUI::BearUIScrollBar::SubScrollOne()
+void BearUI::Classic::BearUIScrollBar::SubScrollOne()
 {
 	ScrollPosition -= ScrollOne;
 	if (ScrollPosition < 0)ScrollPosition = 0;
-	OnMessage(MSB_ScrollUpdatePosition);
-	OnMessage(MSB_ScrollChange);
+	OnMessage(M_ScrollUpdatePosition);
+	OnMessage(M_ScrollChange);
 }

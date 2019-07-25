@@ -38,7 +38,7 @@ bool BearUI::BearFontRef::LoadFromStream(const BearCore::BearInputStream & strea
 		charinfo.TextureUV.y = stream.ReadFloat();
 		charinfo.TextureUV.x1 = stream.ReadFloat();
 		charinfo.TextureUV.y1 = stream.ReadFloat();
-		charinfo.Advance = stream.ReadFloat();
+		charinfo.Advance.x = stream.ReadFloat();
 		charinfo.Position.x = stream.ReadFloat();
 		charinfo.Position.y = stream.ReadFloat();
 		m_data->m_chars_info.insert(c, charinfo);
@@ -82,7 +82,7 @@ bool BearUI::BearFontRef::SaveToFile(const bchar * name)
 			file.WriteFloat(charinfo.TextureUV.x1);
 			file.WriteFloat(charinfo.TextureUV.y1);
 
-			file.WriteFloat(charinfo.Advance);
+			file.WriteFloat(charinfo.Advance.x);
 			file.WriteFloat(charinfo.Position.x);
 			file.WriteFloat(charinfo.Position.y);
 			b++;
@@ -195,15 +195,16 @@ bool BearUI::BearFontRef::LoadFromTTF(const bchar * file, const bchar16 * chars,
 	m_data->m_image.Create(size_texture, size_texture, false, 1, BearGraphics::TPF_R8);
 	m_data->m_image.Fill(BearCore::BearColor::Transparent);
 
-	m_data->m_size = static_cast<bsize>(face->size->metrics.height) / static_cast<bsize>(1 << 6);
-
+	m_data->m_size =  static_cast<bsize>(face->size->metrics.height) / static_cast<bsize>(1 << 6);
+	m_data->m_max_hieght = m_data->m_size;
 	for (bsize i = 0; i < chars_size; i++) {
 
 		bchar16 id = chars_size ==i+1 ?L' ':chars[i];
 		BEAR_ASSERT(id != L'\r' && id != L'\n' && id != L'	');
-		FT_Load_Char(face, id, FT_LOAD_TARGET_NORMAL | FT_LOAD_FORCE_AUTOHINT);
+		FT_Load_Char(face, id, FT_LOAD_TARGET_NORMAL | FT_LOAD_FORCE_AUTOHINT| FT_LOAD_RENDER);
 		FT_Glyph glyphDesc;
 		FT_Get_Glyph(face->glyph, &glyphDesc);
+
 		FT_Glyph_To_Bitmap(&glyphDesc, FT_RENDER_MODE_NORMAL, 0, 1);
 		FT_Bitmap& bitmap = reinterpret_cast<FT_BitmapGlyph>(glyphDesc)->bitmap;
 		unsigned char *data = bitmap.buffer;
@@ -213,6 +214,7 @@ bool BearUI::BearFontRef::LoadFromTTF(const bchar * file, const bchar16 * chars,
 		BearGraphics::BearImage char_img;
 		char_img.Create(width_char, height_char, false, 1, BearGraphics::TPF_R8);
 		char_img.Fill(BearCore::BearColor::Black);
+
 
 
 
@@ -240,10 +242,13 @@ bool BearUI::BearFontRef::LoadFromTTF(const bchar * file, const bchar16 * chars,
 		bsize y = y_t;
 
 		x_t += width_char;
+
+		
+
 		float advance = static_cast<float>(face->glyph->metrics.horiAdvance) / static_cast<float>(1 << 6);
-		float pos_x = static_cast<float>(face->glyph->metrics.horiBearingX) / static_cast<float>(1 << 6);
-		float pos_y = static_cast<float>(size) - ((static_cast<float>(face->glyph->metrics.horiBearingY) / static_cast<float>(1 << 6)));
-		BEAR_ASSERT(pos_y >= 0);
+		/*float pos_x = static_cast<float>(face->glyph->metrics.horiBearingX) / static_cast<float>(1 << 6);
+		float pos_y =/* static_cast<float>(m_data->m_size) - ((static_cast<float>(face->glyph->metrics.vertBearingY) / static_cast<float>(1 << 6)));*/
+		//BEAR_ASSERT(pos_y >= 0);
 
 		CharInfo charinfo;
 		charinfo.Size.x = (static_cast<float>(face->glyph->metrics.width) / static_cast<float>(1 << 6));
@@ -252,10 +257,12 @@ bool BearUI::BearFontRef::LoadFromTTF(const bchar * file, const bchar16 * chars,
 		charinfo.TextureUV.y = y / static_cast<float>(size_texture);
 		charinfo.TextureUV.x1 = width_char / static_cast<float>(size_texture);
 		charinfo.TextureUV.y1 = height_char / static_cast<float>(size_texture);
-		charinfo.Advance = advance;
-		charinfo.Position.x = pos_x;
-		charinfo.Position.y = pos_y;
+		charinfo.Advance.x = advance;
+		charinfo.Advance.y = static_cast<float>(face->glyph->advance.y >> 6);
+		charinfo.Position.x = static_cast<float>(face->glyph->bitmap_left);
+		charinfo.Position.y = size - (static_cast<float>(face->glyph->metrics.horiBearingY) / static_cast<float>(1 << 6));
 		m_data->m_chars_info.insert(id, charinfo);
+		m_data->m_max_hieght = BearCore::bear_max(m_data->m_max_hieght,static_cast<bsize>( charinfo.Position.y + charinfo.Size.y));
 	}
 	m_data->m_image.GenerateMipmap();
 	m_data->m_image.Convert(BearGraphics::TPF_BC4);
