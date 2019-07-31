@@ -5,6 +5,7 @@ namespace BearUI
 	{
 		class BEARUI_API BearCheakBoxSwitch :public BearUIItem
 		{
+			friend class BearCheakBox;
 			BEAR_CLASS_NO_COPY(BearCheakBoxSwitch);
 		public:
 			BearCheakBoxSwitch();
@@ -15,11 +16,7 @@ namespace BearUI
 			BearCore::BearColor ColorOffSelect;
 			bool Switch;
 			BearCore::BearColor ColorPlaneBackground;
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			virtual void OnMessage(int32 message);
 			virtual void Reset();
 			virtual void KillFocus();

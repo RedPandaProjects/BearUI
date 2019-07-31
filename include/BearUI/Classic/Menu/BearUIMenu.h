@@ -7,6 +7,8 @@ namespace BearUI
 		class BEARUI_API BearUIMenuBar;
 		class BEARUI_API BearUIMenu :public BearUIItem
 		{
+			friend BearUIMenuBar;
+			friend BearUIMenuItem;
 			BEAR_CLASS_NO_COPY(BearUIMenu);
 		public:
 			BearUIMenu();
@@ -16,11 +18,7 @@ namespace BearUI
 			BearUIMenuItem&Add(const bchar*Text);
 			void AddBorder();
 			BearUIMenu&AddMenu(const bchar*Text);
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			enum EMessage
 			{
 				M_ItemClick=0x100,

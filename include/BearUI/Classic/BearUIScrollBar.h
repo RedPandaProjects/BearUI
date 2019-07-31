@@ -23,11 +23,22 @@ namespace BearUI
 				CallBack = BearCore::bear_create_class_function_ref(f);
 				CallBack_Class = reinterpret_cast<void*>(cl);
 			}
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
+			enum EStyle
+			{
+				S_LeftRight=1
+			};
+	
+			inline void SetPosition(float position)
+			{
+				ScrollPosition = position;
+				OnMessage(M_ScrollUpdatePosition);
+			}
+			inline void SetZoneView(float zoneView)
+			{
+				ScrollZoneView = zoneView;
+				Reset();
+			}
 		protected:
-#endif
 			enum EMessage
 			{
 				M_ScrollChange = 0x100,
@@ -40,7 +51,6 @@ namespace BearUI
 			void UpdatePosition();
 			void AddScrollOne();
 			void SubScrollOne();
-			BearCore::BearVector<BearCore::BearMemoryRef<BearUIListItem>> UIItems;
 			BearUITexture UIBackground;
 			BearUIButton UIButton;
 			BearUIButton UIButtonDown;

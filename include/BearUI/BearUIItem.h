@@ -19,8 +19,8 @@ namespace BearUI
 		void PopItem(BearUIStaticItem*item);
 		void PopItems();
 		inline bool Focused()const { return Focus; }
-		virtual void Draw(BearUI * ui ,float time);
-		virtual void Update();
+		virtual void Draw(BearUI * ui , BearCore::BearTime time);
+		virtual void Update(BearCore::BearTime time);
 		enum EMessage
 		{
 			M_MouseLevae,
@@ -39,6 +39,7 @@ namespace BearUI
 		virtual void Unload();
 		virtual void Reload();
 		virtual bool OnChar(bchar16 ch);
+		virtual int32 GetCursor(float x, float y);
 		bool MouseEntered();
 		inline BearCore::BearVector2<float> GetMouseLastPosition() {return MouseLastPosition;}
 	private:

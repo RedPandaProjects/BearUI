@@ -5,6 +5,8 @@ namespace BearUI
 	{
 		class BEARUI_API BearUITreeView :public BearUIItem
 		{
+			friend BearUITreeNodeButton;
+			friend BearUITreeNode;
 			BEAR_CLASS_NO_COPY(BearUITreeView);
 		public:
 			BearUITreeView();
@@ -32,13 +34,9 @@ namespace BearUI
 				CallBack_Class = reinterpret_cast<void*>(cl);
 			}
 
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			virtual void Reset();
-			virtual void Update();
+			virtual void Update(BearCore::BearTime time);
 			BearUITreeNode*Select;
 			enum EMessage
 			{

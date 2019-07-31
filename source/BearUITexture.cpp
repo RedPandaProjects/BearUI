@@ -9,7 +9,7 @@ BearUI::BearUITexture::~BearUITexture()
 {
 }
 
-void BearUI::BearUITexture::Draw(BearUI * ui, float time)
+void BearUI::BearUITexture::Draw(BearUI * ui, BearCore::BearTime time)
 {
 	if (Visible)return;
 	m_vertex[0].Position.set(Position.x, Position.y + Size.y);

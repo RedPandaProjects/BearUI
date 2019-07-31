@@ -6,6 +6,7 @@ namespace BearUI
 
 		class BEARUI_API BearUIListBox :public BearUIItem
 		{
+			friend BearUIListItem;
 			BEAR_CLASS_NO_COPY(BearUIListBox);
 
 		public:
@@ -28,17 +29,14 @@ namespace BearUI
 				CallBack = BearCore::bear_create_class_function_ref(f);
 				CallBack_Class = reinterpret_cast<void*>(cl);
 			}
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
+			virtual void Reset();
 		protected:
-#endif
 			enum EMessage
 			{
 				M_SelectedItem = 0x100,
 			};
 			virtual void OnMessage(int32 message);
-			virtual void Reset();
+	
 		private:
 
 			BearCore::BearClassFunctionRef*CallBack;

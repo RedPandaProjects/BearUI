@@ -88,24 +88,22 @@ namespace BearUI
 			{
 				return bPress;
 			}
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
-		protected:
-#endif
-		enum EStyle
-		{
+			enum EStyle
+			{
 				S_WithoutBackground = 1,
-				S_Triangle=2
-		};
-			virtual void Update();
+				S_Triangle = 2
+			};
+			BearUITriangle::EStyle TriangleStyle;
+		protected:
+
+			virtual void Update(BearCore::BearTime time);
 			virtual void OnMessage(int32 message);
 			virtual bool OnMouse(float x, float y);
 			virtual bool OnKeyDown(BearInput::Key key);
 			virtual bool OnKeyUp(BearInput::Key key);
 			virtual void Reset();
 			virtual void KillFocus();
-			BearUITriangle::EStyle TriangleStyle;
+		
 		private:
 			BearUITexture UITexture;
 			BearUITexture UITextureBack;

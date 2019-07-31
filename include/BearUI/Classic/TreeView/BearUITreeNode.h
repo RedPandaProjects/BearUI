@@ -6,6 +6,8 @@ namespace BearUI
 		class BEARUI_API BearUITreeView;
 		class BEARUI_API BearUITreeNode:public BearUIItem
 		{
+			friend BearUITreeNodeButton;
+			friend BearUITreeView;
 			BEAR_CLASS_NO_COPY(BearUITreeNode);
 		public:
 			BearUITreeNode();
@@ -21,11 +23,7 @@ namespace BearUI
 
 			BearUITreeNode&Add(const bchar*text);
 			inline float GetHeight()const { return Height; }
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			BearUITreeView*Parent;
 
 			virtual void Reset();
@@ -35,8 +33,8 @@ namespace BearUI
 				M_Deployed_On = 0x100,
 				M_Deployed_Off,
 			};
-
-			virtual void Update();
+			virtual bool OnMouse(float x, float y);
+			virtual void Update(BearCore::BearTime time);
 			virtual void OnMessage(int32 message);
 			virtual void KillFocus();
 			virtual bool OnKeyDown(BearInput::Key key);

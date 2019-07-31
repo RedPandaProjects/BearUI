@@ -18,11 +18,7 @@ namespace BearUI
 			BearCore::BearString Text;
 			inline const bool Switched()const {return UICheakBoxSwitch.Switch;}
 			void Switch(bool Switch);
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			
 			virtual void Reset();
 		private:

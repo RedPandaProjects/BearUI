@@ -17,11 +17,7 @@ namespace BearUI
 			BearCore::BearColor Color;
 			BearCore::BearString Text;
 			BearFontRef Font;
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			enum EFlags
 			{
 				F_NotHide = 1,

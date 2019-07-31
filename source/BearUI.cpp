@@ -90,13 +90,14 @@ void BearUI::BearUI::Resize(bsize width, bsize height)
 }
 
 
-void BearUI::BearUI::Draw(float time)
+void BearUI::BearUI::Draw(BearCore::BearTime time)
 {
 
 
 	BearGraphics::BearRenderInterface::SetVertexState(BearGraphics::BearDefaultManager::GetVertexState(BearGraphics::DVS_UI));
 	BearGraphics::BearRenderInterface::SetRasterizerState(BearGraphics::BearDefaultManager::GetRasterizerState());
 	BearGraphics::BearRenderInterface::SetBlendState(BearGraphics::BearDefaultManager::GetBlendAlpha(), BearCore::BearColor::Transparent);
+	BearGraphics::BearRenderInterface::SetDepthStencilState(BearGraphics::BearDefaultManager::GetBearDepthStencilState(), 0);
 	/*{
 		auto b = m_items.rbegin();
 		auto e = m_items.rend();
@@ -115,15 +116,42 @@ void BearUI::BearUI::Draw(float time)
 			b++;
 		}
 	}
+	auto m_position = m_cursor_manager.GetMousePosition();
+	{
+		if (m_focus_item)
+		{
+			int32 type = m_focus_item->GetCursor(m_position.x, m_position.y);
+			if (type)
+			{
+				m_cursor_manager.Draw(this, type, time);
+				return;
+			}
+		}
+	}
+	{
+		auto b = m_items.rbegin();
+		auto e = m_items.rend();
+		while (b != e)
+		{
+			int32 type = (*b)->GetCursor(m_position.x, m_position.y);
+			if(type)
+			{
+				m_cursor_manager.Draw(this, type, time);
+				return;
+			}
+			b++;
+		}
+	}
+	m_cursor_manager.Draw(this, m_cursor_manager.C_Default, time);
 }
 
-void BearUI::BearUI::Update(float time)
+void BearUI::BearUI::Update(BearCore::BearTime time)
 {
 	auto b = m_items.rbegin();
 	auto e = m_items.rend();
 	while (b != e)
 	{
-		(*b)->Update();
+		(*b)->Update(time);
 		b++;
 	}
 	
@@ -131,6 +159,7 @@ void BearUI::BearUI::Update(float time)
 
 void BearUI::BearUI::Unload()
 {
+	m_cursor_manager.Unload();
 	auto b = m_items.begin();
 	auto e = m_items.end();
 	while (b != e)
@@ -142,6 +171,7 @@ void BearUI::BearUI::Unload()
 
 void BearUI::BearUI::Reload()
 {
+	m_cursor_manager.Reload();
 	auto b = m_items.begin();
 	auto e = m_items.end();
 	while (b != e)
@@ -153,6 +183,7 @@ void BearUI::BearUI::Reload()
 
 void BearUI::BearUI::Reset()
 {
+	m_cursor_manager.Reset();
 	auto b = m_items.begin();
 	auto e = m_items.end();
 	while (b != e)
@@ -244,6 +275,10 @@ void BearUI::BearUI::OnChar(bchar16 ch)
 
 void BearUI::BearUI::Render(BearUITexture * texture)
 {
+	if (!texture->Flags.test(BearUIStaticItem::UI_NoClip)&&!texture->Clip.inZone(texture->Rect))
+	{
+		return;
+	}
 	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_UI));
     BearGraphics::BearRenderInterface::SetPixelShader(BearGraphics::BearDefaultManager::GetPixelShader(BearGraphics::DPS_UITexture));
 
@@ -274,6 +309,8 @@ void BearUI::BearUI::Render(BearUITexture * texture)
 
 void BearUI::BearUI::Render(BearUIText * text)
 {
+	
+
 	BearGraphics::BearVertexDefault vertex[4];
 
 	bsize size = text->Text.size();
@@ -364,7 +401,7 @@ void BearUI::BearUI::Render(BearUIText * text)
 				}
 
 				{
-					float x = pos.x + item->second.Position.x, y = pos.y + item->second.Position.y+ up;
+					float x = pos.x + item->second.Position.x, y = pos.y + item->second.Position.y + up;
 					float width = item->second.Size.x;
 					float height = item->second.Size.y;
 
@@ -372,20 +409,24 @@ void BearUI::BearUI::Render(BearUIText * text)
 					y = floor(y);
 					width = floor(width);
 					height = floor(height);*/
+					if (text->Flags.test(BearUIStaticItem::UI_NoClip) || text->Clip.inZone(BearCore::BearVector4<float>(x, y, width, height)))
+					{
 
-					vertex[0].Position.set(x, y + height);
-					vertex[1].Position.set(x + width, y);
-					vertex[2].Position.set(x, y);
-					vertex[3].Position.set(x + width, y + height);
-					vertex[0].TextureUV.set(TextureUV.x, TextureUV.y + TextureUV.y1);
-					vertex[1].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y);
-					vertex[2].TextureUV.set(TextureUV.x, TextureUV.y);
-					vertex[3].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y1 + TextureUV.y);
+						vertex[0].Position.set(x, y + height);
+						vertex[1].Position.set(x + width, y);
+						vertex[2].Position.set(x, y);
+						vertex[3].Position.set(x + width, y + height);
+						vertex[0].TextureUV.set(TextureUV.x, TextureUV.y + TextureUV.y1);
+						vertex[1].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y);
+						vertex[2].TextureUV.set(TextureUV.x, TextureUV.y);
+						vertex[3].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y1 + TextureUV.y);
 
-					BearCore::bear_copy(reinterpret_cast<BearGraphics::BearVertexDefault*>(m_vertex_buffer.Lock()), vertex, 4);
-					m_vertex_buffer.Unlock();
-				
-					BearGraphics::BearRenderInterface::DrawIndexed(6);
+						BearCore::bear_copy(reinterpret_cast<BearGraphics::BearVertexDefault*>(m_vertex_buffer.Lock()), vertex, 4);
+						m_vertex_buffer.Unlock();
+
+						BearGraphics::BearRenderInterface::DrawIndexed(6);
+					}
+
 
 				}
 				pos.x += item->second.Advance.x;
@@ -396,8 +437,79 @@ void BearUI::BearUI::Render(BearUIText * text)
 	BearGraphics::BearRenderInterface::DisableScissor();
 }
 
+void BearUI::BearUI::RenderSelectZone(BearUIText * text)
+{
+	bsize size = text->Text.size();
+	if (text->Font.Empty() || !size)return;
+	auto&font = *text->Font.GetListChars();
+	auto pos = text->Position + text->ShiftPosition;
+	text->UISelectTexture.Size.y = static_cast<float>(text->Font.GetHieght());
+
+	bsize start = text->SelectStart;
+	bsize end = text->SelectEnd;
+
+	if (start > end)BearCore::bear_swap(start, end);
+	if (start >= size)return;
+	if (end > size)end=size;
+
+	for (bsize i = 0; i < end; i++)
+	{
+		bchar16 ch_ = BearCore::BearEncoding::ToUTF16(text->Text[i]);
+		if (ch_ == TEXT(' '))
+		{
+			auto item = font.find(ch_);
+		
+			text->UISelectTexture.Position = pos;
+			text->UISelectTexture.Size.x = item->second.Advance.x;
+			if (i >= start)text->UISelectTexture.Draw(this, 0);
+			pos.x += item->second.Advance.x;
+		}
+		else if (ch_ == TEXT('\t'))
+		{
+			ch_ = TEXT(' ');
+			auto item = font.find(ch_);
+			text->UISelectTexture.Position = pos;
+			text->UISelectTexture.Size.x = item->second.Advance.x * 4;
+			if (i >= start)text->UISelectTexture.Draw(this, 0);
+			pos.x += item->second.Advance.x * 4;
+		}
+		else if (ch_ == TEXT('\n'))
+		{
+			pos.y += text->Font.GetHieght();
+			pos.x = text->Position.x + text->ShiftPosition.x;
+		}
+		else if (ch_ != TEXT('\r'))
+		{
+			auto item = font.find(ch_);
+			if (item != font.end())
+			{
+
+				if (pos.x + item->second.Advance.x > text->Rect.x1 + text->Position.x&&text->Style.test(text->ST_MaxWidth))
+				{
+					pos.y += text->Font.GetHieght();
+					pos.x = text->Position.x;
+					
+				}
+
+				{
+					text->UISelectTexture.Position = pos;
+					text->UISelectTexture.Size.x = item->second.Advance.x;
+					if (i >= start)	text->UISelectTexture.Draw(this, 0);
+				}
+				pos.x += item->second.Advance.x;
+			}
+		}
+
+	}
+
+}
+
 void BearUI::BearUI::Render(BearUITriangle * triangle)
 {
+	if (!triangle->Flags.test(BearUIStaticItem::UI_NoClip) && !triangle->Clip.inZone(triangle->Rect))
+	{
+		return;
+	}
 	BearGraphics::BearVertexDefault vertex[3];
 	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_UI));
 	BearGraphics::BearRenderInterface::SetPixelShader(BearGraphics::BearDefaultManager::GetPixelShader(BearGraphics::DPS_UITexture));

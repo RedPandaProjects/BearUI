@@ -49,7 +49,7 @@ void BearUI::Classic::BearUITreeView::Reset()
 		float Height = 0;
 		for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
 		{
-			(*b)->Update();
+			(*b)->Update(BearCore::BearTime());
 			Height += (*b)->GetHeight();
 		}
 		UIScrollBar.ScrollZoneView = Rect.y1 / (Height);
@@ -85,7 +85,7 @@ BearUI::Classic::BearUITreeNode & BearUI::Classic::BearUITreeView::Add(const bch
 	return *Node;
 }
 
-void BearUI::Classic::BearUITreeView::Update()
+void BearUI::Classic::BearUITreeView::Update(BearCore::BearTime time)
 {
 	if (bUpdateScrollBar)UpdateScrollBar();
 	bool bViewedAll = ViewedAll();
@@ -115,10 +115,10 @@ void BearUI::Classic::BearUITreeView::Update()
 		(*b)->Position.y += Height;
 		(*b)->Size = size;
 		(*b)->Clip = clip;
-		(*b)->Update();
+		(*b)->Update(time);
 		Height += (*b)->GetHeight();
 	}
-	BearUIItem::Update();
+	BearUIItem::Update(time);
 }
 
 void BearUI::Classic::BearUITreeView::OnMessage(int32 message)
@@ -144,22 +144,21 @@ void BearUI::Classic::BearUITreeView::UpdateScrollBar()
 	float Height = 0;
 	for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
 	{
-		(*b)->Update();
+		(*b)->Update(BearCore::BearTime());
 		Height += (*b)->GetHeight();
 	}
 	UIScrollBar.ScrollOne = static_cast<float>(Font.GetHieght()) / (Height);
-	UIScrollBar.ScrollZoneView = Rect.y1 / (Height);
+	UIScrollBar.SetZoneView ( Rect.y1 / (Height));
 
 	ScrollBarHeight =BearCore::bear_max( Height - (Rect.y1 - 2),0.f);
 
 
-	UIScrollBar.Reset();
+	//UIScrollBar.Reset();
 	if (old_delata_y > ScrollBarHeight)old_delata_y = ScrollBarHeight;
 	if (ScrollBarHeight == 0)
-		UIScrollBar.ScrollPosition = 0;
+		UIScrollBar.SetPosition(0);
 	else
-		UIScrollBar.ScrollPosition = old_delata_y / ScrollBarHeight;
-	UIScrollBar.OnMessage(UIScrollBar.M_ScrollUpdatePosition);
+		UIScrollBar.SetPosition(old_delata_y / ScrollBarHeight);
 }
 
 bool BearUI::Classic::BearUITreeView::ViewedAll()
@@ -172,7 +171,7 @@ bool BearUI::Classic::BearUITreeView::ViewedAll()
 		(*b)->Position.y += Height;
 		(*b)->Size = Size;
 		(*b)->Clip = Clip;
-		(*b)->Update();
+		(*b)->Update(BearCore::BearTime());
 		Height += (*b)->GetHeight();
 	}
 

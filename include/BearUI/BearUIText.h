@@ -4,12 +4,18 @@ namespace BearUI
 	class BEARUI_API BearUIText:public BearUIStaticItem
 	{
 		BEAR_CLASS_NO_COPY(BearUIText);
-
+		friend class BearUI;
 	public:
 		BearUIText();
 		~BearUIText();
 		BearCore::BearString Text;
 		BearCore::BearColor Color;
+
+		bsize SelectStart;
+		bsize SelectEnd;
+		bool Select;
+		BearCore::BearColor ColorSelect;
+
 		BearFontRef Font;
 		BearCore::BearVector2<float> ShiftPosition;
 		enum StyleText
@@ -26,17 +32,14 @@ namespace BearUI
 		float GetMaxSizeLine(const bchar*text,bsize size)const;
 		float GetSizeLastLine(const bchar*text)const;
 		float GetSizeLastLine(const bchar*text, bsize size)const;
-#ifdef BEAR_UI_EXPORTS
-	public:
-#else
-	protected:
-#endif
-		float GetMaxHeightCharInLine(const bchar*text)const;
-		virtual void Draw(BearUI * ui, float time);
 		virtual void Reset();
+	public:
+		float GetMaxHeightCharInLine(const bchar*text)const;
+		virtual void Draw(BearUI * ui, BearCore::BearTime time);
+
 		virtual void Unload();
 		virtual void Reload();
 	private:
-		
+		BearUITexture UISelectTexture;
 	};
 }

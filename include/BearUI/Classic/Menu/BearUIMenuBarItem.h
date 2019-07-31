@@ -7,6 +7,7 @@ namespace BearUI
 	
 		class BEARUI_API BearUIMenuBarItem :public BearUIItem
 		{
+			friend class BearUIMenuBar;
 			BEAR_CLASS_NO_COPY(BearUIMenuBarItem);
 		public:
 			BearUIMenuBarItem();
@@ -15,11 +16,7 @@ namespace BearUI
 			BearFontRef Font;
 			BearCore::BearString Text;
 			BearUIMenu*Menu;
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			enum EMesssage
 			{
 				M_Hide=0x100
@@ -29,7 +26,7 @@ namespace BearUI
 				S_NotHide = 1,
 			};
 	
-			virtual void Update();
+			virtual void Update(BearCore::BearTime time);
 			virtual void OnMessage(int32 message);
 			virtual void Reset();
 			virtual void KillFocus();

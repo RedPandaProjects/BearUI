@@ -22,7 +22,7 @@ float BearUI::Classic::BearUIListItem::GetHieght(const BearFontRef & font)
 }
 
 
-void BearUI::Classic::BearUIListItem::Update()
+void BearUI::Classic::BearUIListItem::Update(BearCore::BearTime time)
 {
 	UIText.Rect = Rect;
 	UIText.Rect.y += 1;
@@ -30,7 +30,7 @@ void BearUI::Classic::BearUIListItem::Update()
 	UIPlane.Rect = Rect;
 
 
-	return BearUIItem::Update();
+	return BearUIItem::Update(time);
 }
 
 void BearUI::Classic::BearUIListItem::OnMessage(int32 message)

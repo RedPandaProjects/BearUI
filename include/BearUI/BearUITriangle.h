@@ -18,12 +18,8 @@ namespace BearUI
 			S_TriangleLeft =3 ,
 			S_TriangleRight=7,
 		};
-#ifdef BEAR_UI_EXPORTS
 	public:
-#else
-	protected:
-#endif
-		virtual void Draw(BearUI * ui, float time);
+		virtual void Draw(BearUI * ui, BearCore::BearTime time);
 		virtual void Reset();
 		virtual void Unload();
 		virtual void Reload();

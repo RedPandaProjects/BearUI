@@ -78,7 +78,7 @@ void BearUI::BearUIItem::PopItems()
 	m_items.clear_not_free();
 }
 
-void BearUI::BearUIItem::Update()
+void BearUI::BearUIItem::Update(BearCore::BearTime time)
 {
 	if (Visible)return;
 	{
@@ -86,13 +86,13 @@ void BearUI::BearUIItem::Update()
 		auto e = m_items.end();
 		while (b != e)
 		{
-			(*b)->Update();
+			(*b)->Update(time);
 			b++;
 		}
 	}
 }
 
-void BearUI::BearUIItem::Draw(BearUI * ui, float time)
+void BearUI::BearUIItem::Draw(BearUI * ui, BearCore::BearTime time)
 {
 	if (Visible)return;
 	{
@@ -124,7 +124,18 @@ void BearUI::BearUIItem::OnMessage(int32 message)
 		m_mouse_enter = true;
 		break;
 	case M_MouseLevae:
+	{
+		{
+			auto b = m_items.begin();
+			auto e = m_items.end();
+			while (b != e)
+			{
+				(*b)->OnMessage(M_MouseLevae);
+				b++;
+			}
+		}
 		m_mouse_enter = false;
+	}
 		break;
 	}
 
@@ -141,7 +152,7 @@ bool BearUI::BearUIItem::OnMouse(float x, float y)
 			auto e = m_items.end();
 			while (b != e)
 			{
-				if((*b)->m_mouse_enter&&m_focus_item!=*b)
+				if(m_focus_item!=*b)
 				(*b)->OnMessage(M_MouseLevae);
 				b++;
 			}
@@ -157,12 +168,13 @@ bool BearUI::BearUIItem::OnMouse(float x, float y)
 			b++;
 			while (b != e)
 			{
-				if ((*b)->m_mouse_enter)
-				{
+				/*if ((*b)->m_mouse_enter)
+				{*/
 					(*b)->OnMessage(M_MouseLevae);
-				}
+				//}
 			//	printf("Levae %p\r\n", (*b));
 				b++;
+			
 			}
 			return true;
 		}
@@ -179,11 +191,11 @@ bool BearUI::BearUIItem::OnMouse(float x, float y)
 	}
 	else
 	{
-		if (m_mouse_enter) 
-		{
+	/*	if (m_mouse_enter) 
+		{*/
 			OnMessage(M_MouseLevae);
-		//	printf("Levae %p\r\n", this);
-		}
+			
+		//}
 	}
 	return false;
 }
@@ -363,6 +375,26 @@ bool BearUI::BearUIItem::OnChar(bchar16 ch)
 		b++;
 	}
 	return false;
+}
+
+int32 BearUI::BearUIItem::GetCursor(float x,float y)
+{
+	if (Visible)return false;
+	if (m_focus_item)
+	{
+		int32 type = m_focus_item->GetCursor(x,y);
+		if (type)return type;
+	}
+
+	auto b = m_items.begin();
+	auto e = m_items.end();
+	while (b != e)
+	{
+		int32 type = (*b)->GetCursor(x,y);
+		if (type)return type;
+		b++;
+	}
+	return 0;
 }
 
 bool BearUI::BearUIItem::MouseEntered()

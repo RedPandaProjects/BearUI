@@ -35,4 +35,7 @@
 #include "BearUI/Classic/CheckBox/BearCheakBox.h"
 
 #include "BearUI/Classic/BearUITextBox.h"
+
+#include "BearUI/BearUICursorManager.h"
+#include "BearUI/Classic/Cursor/BearUICursorText.h"
 #include "BearUI/BearUI.h"

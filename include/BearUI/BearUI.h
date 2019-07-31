@@ -9,8 +9,8 @@ namespace BearUI
 		BearUI(bsize width, bsize height);
 
 		void Resize(bsize width, bsize height);
-		void Draw(float time);
-		void Update(float time);
+		void Draw(BearCore::BearTime time);
+		void Update(BearCore::BearTime time);
 		void Unload();
 		void Reload();
 		void Reset();
@@ -29,10 +29,12 @@ namespace BearUI
 			F_ENG,
 			F_RUS,
 		};
+
 		BearFontRef GetFont(FontLang lang,bsize size);
 
 		BearUIItem* PushItem(BearUIItem*item);
 		BearUIStaticItem* PushItem(BearUIStaticItem*item);
+		inline BearUICursorManager&GetCursorManager() { return m_cursor_manager; }
 #ifdef BEAR_UI_EXPORTS
 	public:
 #else
@@ -40,6 +42,7 @@ namespace BearUI
 #endif
 		void Render(BearUITexture*texture);
 		void Render(BearUIText*text);
+		void RenderSelectZone(BearUIText*text);
 		void Render(BearUITriangle*triangle);
 	private:
 		void UpdateFocus();
@@ -74,7 +77,7 @@ namespace BearUI
 		BearCore::BearMap<FontInfo, BearFontRef> m_fonts;
 
 		BearCore::BearVector2<bsize> m_size_screen;
-
+		BearUICursorManager m_cursor_manager;
 		BearUIItem* m_focus_item;
 	};
 }

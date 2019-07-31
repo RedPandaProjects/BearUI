@@ -68,11 +68,16 @@ void BearUI::Classic::BearUITreeNode::Reset()
 		if (!Parent)
 			PushItem(**b);
 	}
-	Update();
+	Update(BearCore::BearTime());
 	BearUIItem::Reset();
 }
 
-void BearUI::Classic::BearUITreeNode::Update()
+bool BearUI::Classic::BearUITreeNode::OnMouse(float x, float y)
+{
+	return BearUIItem::OnMouse(x,y);
+}
+
+void BearUI::Classic::BearUITreeNode::Update(BearCore::BearTime time)
 {
 	Height = 0;
 	Size.y = static_cast<float>(Font.GetHieght()) + 2;
@@ -110,12 +115,12 @@ void BearUI::Classic::BearUITreeNode::Update()
 		(*b)->Size = Size;
 		(*b)->Clip = Clip;
 		(*b)->WidthShift = width_shift;
-		(*b)->Update();
+		(*b)->Update(BearCore::BearTime());
 		if(Deployed)
 		Height += (*b)->GetHeight();
 	}
 
-	BearUIItem::Update();
+	BearUIItem::Update(time);
 }
 
 void BearUI::Classic::BearUITreeNode::OnMessage(int32 message)
@@ -170,6 +175,7 @@ void BearUI::Classic::BearUITreeNode::KillFocus()
 	}
 	else
 	{
+		UIButton.ColorSelect = ColorSelectFocus;
 		UIPlane.Visible = true;
 	}
 	BearUIItem::KillFocus();

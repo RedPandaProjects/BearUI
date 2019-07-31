@@ -8,7 +8,7 @@ BearUI::BearUIStaticItem::~BearUIStaticItem()
 {
 } 
 
-void BearUI::BearUIStaticItem::Draw(BearUI * ui, float time)
+void BearUI::BearUIStaticItem::Draw(BearUI * ui, BearCore::BearTime time)
 {
 }
 

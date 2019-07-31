@@ -65,7 +65,7 @@ void BearUI::Classic::BearUIMenuBar::Reset()
 	BearUIItem::Reset();
 }
 
-void BearUI::Classic::BearUIMenuBar::Update()
+void BearUI::Classic::BearUIMenuBar::Update(BearCore::BearTime time)
 {
 	if (Focused())
 	{
@@ -81,7 +81,7 @@ void BearUI::Classic::BearUIMenuBar::Update()
 			(*b)->Flags.set(false, BearUIMenuBarItem::S_NotHide);
 		}
 	}
-	BearUIItem::Update();
+	BearUIItem::Update(time);
 }
 
 bool BearUI::Classic::BearUIMenuBar::OnMouse(float x, float y)

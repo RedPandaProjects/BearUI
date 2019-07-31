@@ -22,11 +22,7 @@ namespace BearUI
 				CallBack = BearCore::bear_create_class_function_ref(f);
 				CallBack_Class = reinterpret_cast<void*>(cl);
 			}
-#ifdef BEAR_UI_EXPORTS
-		public:
-#else
 		protected:
-#endif
 			enum EMessage
 			{
 				M_SelectItem,

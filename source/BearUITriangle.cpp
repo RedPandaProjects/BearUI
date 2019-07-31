@@ -8,7 +8,7 @@ BearUI::BearUITriangle::~BearUITriangle()
 {
 }
 
-void BearUI::BearUITriangle::Draw(BearUI * ui, float time)
+void BearUI::BearUITriangle::Draw(BearUI * ui, BearCore::BearTime time)
 {
 	if (Visible)return;
 	ui->Render(this);

@@ -49,7 +49,7 @@ void BearUI::Classic::BearUITreeNodeButton::Reset()
 	BearUIItem::Reset();
 }
 
-void BearUI::Classic::BearUITreeNodeButton::Update()
+void BearUI::Classic::BearUITreeNodeButton::Update(BearCore::BearTime time)
 {
 	UITriangle.Clip = Clip;
 	UITriangle.Rect = Rect;
@@ -63,7 +63,8 @@ void BearUI::Classic::BearUITreeNodeButton::Update()
 
 		UITriangle.Style.set(true, UITriangle.S_TriangleRight);
 	}
-	BearUIItem::Update();
+
+	BearUIItem::Update(time);
 }
 
 void BearUI::Classic::BearUITreeNodeButton::KillFocus()

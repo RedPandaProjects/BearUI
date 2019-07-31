@@ -22,7 +22,10 @@ void BearUI::Classic::BearUIScrollBar::OnMessage(int32 message)
 	switch (message)
 	{
 	case M_ScrollUpdatePosition:
-		UIButton.Position.y = floorf((ScrollPosition *(Rect.y1 - 32 - UIButton.Size.y)) + 16 + Rect.y);
+		if(Style.test(S_LeftRight))
+			UIButton.Position.x = floorf((ScrollPosition *(Rect.x1 - 32 - UIButton.Size.x)) + 16 + Rect.x);
+		else
+			UIButton.Position.y = floorf((ScrollPosition *(Rect.y1 - 32 - UIButton.Size.y)) + 16 + Rect.y);
 		break;
 	case M_ScrollChange:
 		if(CallBack)CallBack->Call<void>(CallBack_Class);
@@ -49,20 +52,38 @@ void BearUI::Classic::BearUIScrollBar::Reset()
 	UIButton.Rect = Rect;
 	UIButtonDown.Rect = Rect;
 	UIButtonUp.Rect = Rect;
+	if (Style.test(S_LeftRight))
+	{
+		UIButton.Rect.y += 3;
+		UIButton.Rect.y1 -= 6;
+		UIButton.Rect.x1 -= 32;
+		UIButton.Rect.x1 *= ScrollZoneView;
+		UIButton.Rect.x += 16;
+		if (ScrollZoneView >= 1.f)UIButton.Visible = true;
+		else UIButton.Visible = false;
+		UIButtonUp.Rect.x1 = 16;
 
-	UIButton.Rect.x += 3;
-	UIButton.Rect.x1 -= 6;
-	UIButton.Rect.y1 -= 32;
-	UIButton.Rect.y1 *= ScrollZoneView;
-	UIButton.Rect.y += 16;
-
-	UIButtonUp.Rect.y1 = 16;
 
 
+		UIButtonDown.Rect.x = Rect.x + Rect.x1 - 16;
+		UIButtonDown.Rect.x1 = 16;
+	}
+	else
+	{
+		UIButton.Rect.x += 3;
+		UIButton.Rect.x1 -= 6;
+		UIButton.Rect.y1 -= 32;
+		UIButton.Rect.y1 *= ScrollZoneView;
+		UIButton.Rect.y += 16;
+		if (ScrollZoneView >= 1.f)UIButton.Visible = true;
+		else UIButton.Visible = false;
+		UIButtonUp.Rect.y1 = 16;
 
-	UIButtonDown.Rect.y = Rect.y + Rect.y1 - 16;
-	UIButtonDown.Rect.y1 = 16;
 
+
+		UIButtonDown.Rect.y = Rect.y + Rect.y1 - 16;
+		UIButtonDown.Rect.y1 = 16;
+	}
 
 
 	UIButton.Flags.OR( UIButton.F_CallBackPress);
@@ -77,15 +98,30 @@ void BearUI::Classic::BearUIScrollBar::Reset()
 
 void BearUI::Classic::BearUIScrollBar::UpdatePosition()
 {
-	float change = MousePosition.y - StartPosition.y;
-	UIButton.Position.y += change;
-	StartPosition.y = MousePosition.y  ;
-	if (UIButton.Position.y < Rect.y + 16)
-		UIButton.Position.y = Rect.y + 16;
-	else if (UIButton.Position.y > Rect.y + Rect.y1- UIButtonDown.Rect.y1- UIButton.Rect.y1)
-		UIButton.Position.y = Rect.y + Rect.y1  - UIButtonDown.Rect.y1 - UIButton.Rect.y1;
-	ScrollPosition = (UIButton.Position.y - Rect.y - 16 ) / (Rect.y1 - 32- UIButton.Size.y);
-	OnMessage(M_ScrollChange);
+	if (!Style.test(S_LeftRight))
+	{
+		float change = MousePosition.y - StartPosition.y;
+		UIButton.Position.y += change;
+		StartPosition.y = MousePosition.y;
+		if (UIButton.Position.y < Rect.y + 16)
+			UIButton.Position.y = Rect.y + 16;
+		else if (UIButton.Position.y > Rect.y + Rect.y1 - UIButtonDown.Rect.y1 - UIButton.Rect.y1)
+			UIButton.Position.y = Rect.y + Rect.y1 - UIButtonDown.Rect.y1 - UIButton.Rect.y1;
+		ScrollPosition = (UIButton.Position.y - Rect.y - 16) / (Rect.y1 - 32 - UIButton.Size.y);
+		OnMessage(M_ScrollChange);
+	}
+	else
+	{
+		float change = MousePosition.x - StartPosition.x;
+		UIButton.Position.x += change;
+		StartPosition.x = MousePosition.x;
+		if (UIButton.Position.x < Rect.x + 16)
+			UIButton.Position.x = Rect.x + 16;
+		else if (UIButton.Position.x > Rect.x + Rect.x1 - UIButtonDown.Rect.x1 - UIButton.Rect.x1)
+			UIButton.Position.x = Rect.x + Rect.x1 - UIButtonDown.Rect.x1 - UIButton.Rect.x1;
+		ScrollPosition = (UIButton.Position.x - Rect.x - 16) / (Rect.x1 - 32 - UIButton.Size.x);
+		OnMessage(M_ScrollChange);
+	}
 }
 
 void BearUI::Classic::BearUIScrollBar::AddScrollOne()

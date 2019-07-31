@@ -9,9 +9,9 @@ BearUI::Classic::BearUIMenuBarItem::~BearUIMenuBarItem()
 {
 }
 
-void BearUI::Classic::BearUIMenuBarItem::Update()
+void BearUI::Classic::BearUIMenuBarItem::Update(BearCore::BearTime time)
 {
-	BearUIItem::Update();
+	BearUIItem::Update(time);
 	if (Flags.is(S_NotHide) && MouseEntered())
 	{
 		UIPlane.Visible = false;

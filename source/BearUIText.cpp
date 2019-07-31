@@ -3,7 +3,7 @@
 
 
 
-BearUI::BearUIText::BearUIText():Color(BearCore::BearColor::White)
+BearUI::BearUIText::BearUIText():Color(BearCore::BearColor::White), Select(0),SelectStart(0),SelectEnd(0)
 {
 }
 
@@ -245,8 +245,11 @@ float BearUI::BearUIText::GetMaxHeightCharInLine(const bchar * text) const
 	return  max_y;
 }
 
-void BearUI::BearUIText::Draw(BearUI * ui, float time)
+void BearUI::BearUIText::Draw(BearUI * ui, BearCore::BearTime time)
 {
+	if (Font.Empty())return;
+	if(Select)
+	ui->RenderSelectZone(this);
 	ui->Render(this);
 }
 
@@ -265,14 +268,20 @@ void BearUI::BearUIText::Reset()
 		float  size_width = GetMaxSizeLine(*Text);
 		ShiftPosition.x = floorf((Size.x) / 2 - size_width / 2);
 	}
+	UISelectTexture.Flags.set(Flags.test(UI_NoClip), UI_NoClip);
+	UISelectTexture.Clip = Clip;
+	UISelectTexture.Color = ColorSelect;
+	UISelectTexture.Reset();
 }
 
 void BearUI::BearUIText::Unload()
 {
 	Font.UnloadTexture();
+	UISelectTexture.Unload();
 }
 
 void BearUI::BearUIText::Reload()
 {
 	Font.ReloadTexture();
+	UISelectTexture.Reload();
 }

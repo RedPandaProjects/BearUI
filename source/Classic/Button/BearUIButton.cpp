@@ -18,9 +18,9 @@ BearUI::Classic::BearUIButton::~BearUIButton()
 }
 
 
-void BearUI::Classic::BearUIButton::Update()
+void BearUI::Classic::BearUIButton::Update(BearCore::BearTime time)
 {
-	BearUIItem::Update();
+	BearUIItem::Update(time);
 	if (bPress)
 	{
 		if (CallBack)CallBack->Call<void>(CallBack_Class);

@@ -54,6 +54,7 @@ namespace BearUI
 		virtual void SetFullScreen(bool fullscreen);
 		virtual void SetVsync(bool vsync);
 		virtual bool Update();
+		void  ShowCursor(bool show);
 		BearCore::BearVector2<float> GetMousePosition();
 		void SetMousePosition(const BearCore::BearVector2<float>&position);
 		bool GetEvent(BearEventViewport&e);
@@ -89,7 +90,9 @@ namespace BearUI
 #endif
 
 	private:
+		
 #ifdef WINDOWS
+		bool m_MouseShow;
 		HWND
 #elif LINUX
 		void*

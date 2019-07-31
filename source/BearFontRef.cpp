@@ -192,7 +192,7 @@ bool BearUI::BearFontRef::LoadFromTTF(const bchar * file, const bchar16 * chars,
 	uint32 max_y = 0;
 	uint32 size_texture = static_cast<uint32>(BearCore::bear_recommended_size(static_cast<bsize>(sqrtf(static_cast<float>(chars_size*size*size)))));
 
-	m_data->m_image.Create(size_texture, size_texture, false, 1, BearGraphics::TPF_R8);
+	m_data->m_image.Create(size_texture, size_texture, 1, 1, BearGraphics::TPF_R8);
 	m_data->m_image.Fill(BearCore::BearColor::Transparent);
 
 	m_data->m_size =  static_cast<bsize>(face->size->metrics.height) / static_cast<bsize>(1 << 6);
@@ -212,7 +212,7 @@ bool BearUI::BearFontRef::LoadFromTTF(const bchar * file, const bchar16 * chars,
 		uint32 height_char = bitmap.rows;
 
 		BearGraphics::BearImage char_img;
-		char_img.Create(width_char, height_char, false, 1, BearGraphics::TPF_R8);
+		char_img.Create(width_char, height_char, 1, 1, BearGraphics::TPF_R8);
 		char_img.Fill(BearCore::BearColor::Black);
 
 
