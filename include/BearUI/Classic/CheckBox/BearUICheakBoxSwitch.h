@@ -3,13 +3,13 @@ namespace BearUI
 {
 	namespace Classic
 	{
-		class BEARUI_API BearCheakBoxSwitch :public BearUIItem
+		class BEARUI_API BearUICheakBoxSwitch :public BearUIItem
 		{
-			friend class BearCheakBox;
-			BEAR_CLASS_NO_COPY(BearCheakBoxSwitch);
+			friend class BearUICheakBox;
+			BEAR_CLASS_NO_COPY(BearUICheakBoxSwitch);
 		public:
-			BearCheakBoxSwitch();
-			~BearCheakBoxSwitch();
+			BearUICheakBoxSwitch();
+			~BearUICheakBoxSwitch();
 			BearCore::BearColor ColorOn;
 			BearCore::BearColor ColorOnSelect;
 			BearCore::BearColor ColorOff;

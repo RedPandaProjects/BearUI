@@ -14,6 +14,7 @@ BearUI::Classic::BearUITreeView::BearUITreeView():ScrollBarHeight(0)
 
 BearUI::Classic::BearUITreeView::~BearUITreeView()
 {
+	if(CallBack)
 	CallBack->Destroy();
 }
 

@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::Classic::BearCheakBoxSwitch::BearCheakBoxSwitch():Switch(false)
+BearUI::Classic::BearUICheakBoxSwitch::BearUICheakBoxSwitch():Switch(false)
 {
 	ColorPlaneBackground.Set(uint8(100), uint8(100), uint8(100));
 	ColorOff.Set(uint8(45), uint8(45), uint8(45));
@@ -12,11 +12,11 @@ BearUI::Classic::BearCheakBoxSwitch::BearCheakBoxSwitch():Switch(false)
 	UIPlaneBackground.Flags.set(false, UIPlaneBackground.UI_NoMouseEnter);
 }
 
-BearUI::Classic::BearCheakBoxSwitch::~BearCheakBoxSwitch()
+BearUI::Classic::BearUICheakBoxSwitch::~BearUICheakBoxSwitch()
 {
 }
 
-void BearUI::Classic::BearCheakBoxSwitch::OnMessage(int32 message)
+void BearUI::Classic::BearUICheakBoxSwitch::OnMessage(int32 message)
 {
 	switch (message)
 	{
@@ -40,7 +40,7 @@ void BearUI::Classic::BearCheakBoxSwitch::OnMessage(int32 message)
 	BearUIItem::OnMessage(message);
 }
 
-void BearUI::Classic::BearCheakBoxSwitch::Reset()
+void BearUI::Classic::BearUICheakBoxSwitch::Reset()
 {
 
 
@@ -54,7 +54,7 @@ void BearUI::Classic::BearCheakBoxSwitch::Reset()
 	BearUIItem::Reset();
 }
 
-void BearUI::Classic::BearCheakBoxSwitch::KillFocus()
+void BearUI::Classic::BearUICheakBoxSwitch::KillFocus()
 {
 	if (!Switch)
 		UIPlane.Color = ColorOff;

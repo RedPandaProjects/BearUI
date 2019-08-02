@@ -67,6 +67,7 @@ BearUI::BearFontRef BearUI::BearUI::GetFont(FontLang lang, bsize size)
 BearUI::BearUIItem * BearUI::BearUI::PushItem(BearUIItem * item)
 {
 	item->Reset();
+	item->UI = this;
 	m_items.push_back(item);
 	m_static_items.push_back(item);
 	return item;
@@ -207,13 +208,13 @@ void BearUI::BearUI::KillFocus()
 
 void BearUI::BearUI::OnMouse(float x, float y)
 {
-	if (m_focus_item&&m_focus_item->OnMouse(x, y))
-		return;
+	/*if (m_focus_item&&m_focus_item->OnMouse(x, y))
+		return;*/
 	auto b = m_items.begin();
 	auto e = m_items.end();
 	while (b != e)
 	{
-		if ((*b) != m_focus_item)
+	/*	if ((*b) != m_focus_item)*/
 			if ((*b)->OnMouse(x, y))
 				break;
 		b++;
@@ -222,14 +223,14 @@ void BearUI::BearUI::OnMouse(float x, float y)
 
 void BearUI::BearUI::OnKeyDown(BearInput::Key key)
 {
-	if (m_focus_item&&m_focus_item->OnKeyDown(key))
-		return;
+/*	if (m_focus_item&&m_focus_item->OnKeyDown(key))
+		return;*/
 
 	auto b = m_items.begin();
 	auto e = m_items.end();
 	while (b != e)
 	{
-		if (m_focus_item !=*b&&(*b)->OnKeyDown(key))
+		if (/*m_focus_item !=*b&&*/(*b)->OnKeyDown(key))
 		{
 			m_focus_item = (*b);
 			UpdateFocus();
@@ -241,13 +242,13 @@ void BearUI::BearUI::OnKeyDown(BearInput::Key key)
 
 void BearUI::BearUI::OnKeyUp(BearInput::Key key)
 {
-	if (m_focus_item&&m_focus_item->OnKeyUp(key))
-		return;
+	/*if (m_focus_item&&m_focus_item->OnKeyUp(key))
+		return;*/
 	auto b = m_items.begin();
 	auto e = m_items.end();
 	while (b != e)
 	{
-		if (m_focus_item != *b &&(*b)->OnKeyUp(key))break;
+		if (/*m_focus_item != *b &&*/(*b)->OnKeyUp(key))break;
 		b++;
 	}
 }

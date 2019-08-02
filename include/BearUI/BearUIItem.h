@@ -1,8 +1,10 @@
 #pragma once
 namespace BearUI
 {
+	class BEARUI_API  BearUI;
 	class BEARUI_API BearUIItem:public BearUIStaticItem
 	{
+		friend BearUI;
 		BEAR_CLASS_NO_COPY(BearUIItem);
 	public:
 		BearUIItem();
@@ -42,6 +44,8 @@ namespace BearUI
 		virtual int32 GetCursor(float x, float y);
 		bool MouseEntered();
 		inline BearCore::BearVector2<float> GetMouseLastPosition() {return MouseLastPosition;}
+	protected:
+		BearUI*UI;
 	private:
 		BearCore::BearVector2<float> MouseLastPosition;
 		void UpdateFocus();

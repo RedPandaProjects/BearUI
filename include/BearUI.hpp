@@ -31,11 +31,14 @@
 #include "BearUI/Classic/TreeView/BearUITreeNode.h"
 #include "BearUI/Classic/TreeView/BearUITreeView.h"
 
-#include "BearUI/Classic/CheckBox/BearCheakBoxSwitch.h"
-#include "BearUI/Classic/CheckBox/BearCheakBox.h"
+#include "BearUI/Classic/CheckBox/BearUICheakBoxSwitch.h"
+#include "BearUI/Classic/CheckBox/BearUICheakBox.h"
 
 #include "BearUI/Classic/BearUITextBox.h"
 
+#include "BearUI/Classic/BearUIGroupBox.h"
+
 #include "BearUI/BearUICursorManager.h"
 #include "BearUI/Classic/Cursor/BearUICursorText.h"
+
 #include "BearUI/BearUI.h"

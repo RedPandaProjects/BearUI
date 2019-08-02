@@ -3,12 +3,12 @@ namespace BearUI
 {
 	namespace Classic
 	{
-		class BEARUI_API BearCheakBox :public BearUIItem
+		class BEARUI_API BearUICheakBox :public BearUIItem
 		{
-			BEAR_CLASS_NO_COPY(BearCheakBox);
+			BEAR_CLASS_NO_COPY(BearUICheakBox);
 		public:
-			BearCheakBox();
-			~BearCheakBox();
+			BearUICheakBox();
+			~BearUICheakBox();
 			BearCore::BearColor ColorOn;
 			BearCore::BearColor ColorOnSelect;
 			BearCore::BearColor ColorOff;
@@ -22,7 +22,7 @@ namespace BearUI
 			
 			virtual void Reset();
 		private:
-			BearCheakBoxSwitch UICheakBoxSwitch;
+			BearUICheakBoxSwitch UICheakBoxSwitch;
 			BearUIText           UIText;
 		};
 	}

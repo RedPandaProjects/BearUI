@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIItem::BearUIItem():m_mouse_enter(false), Focus(0), m_focus_item(0), Enable(true)
+BearUI::BearUIItem::BearUIItem():m_mouse_enter(false), Focus(0), m_focus_item(0), Enable(true), UI(0)
 {
 }
 
@@ -11,6 +11,7 @@ BearUI::BearUIItem::~BearUIItem()
 void BearUI::BearUIItem::PushItem(BearUIItem * item)
 {
 	item->Reset();
+	item->UI = UI;
 	m_items.push_back(item);
 	m_static_items.push_back(item);
 }
@@ -24,6 +25,7 @@ void BearUI::BearUIItem::PushItem(BearUIStaticItem * item)
 void BearUI::BearUIItem::PushItemInBegin(BearUIItem * item)
 {
 	item->Reset();
+	item->UI = UI;
 	m_items.insert(m_items.begin(),item);
 	m_static_items.insert(m_static_items.begin(), item);
 }
@@ -36,6 +38,7 @@ void BearUI::BearUIItem::PushItemInBegin(BearUIStaticItem * item)
 
 void BearUI::BearUIItem::PopItem(BearUIItem * item)
 {
+	item->UI = 0;
 	{
 		auto i = dynamic_cast<BearUIStaticItem*>(item);
 		if (i)PopItem(i);
@@ -74,6 +77,15 @@ void BearUI::BearUIItem::PopItem(BearUIStaticItem * item)
 
 void BearUI::BearUIItem::PopItems()
 {
+	{
+		auto b = m_items.begin();
+		auto e = m_items.end();
+		while (b != e)
+		{
+			(*b)->UI = 0;
+			b++;
+		}
+	}
 	m_static_items.clear_not_free();
 	m_items.clear_not_free();
 }

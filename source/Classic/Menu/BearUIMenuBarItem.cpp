@@ -44,10 +44,10 @@ void BearUI::Classic::BearUIMenuBarItem::Reset()
 	PopItems();
 	UIText.Text = Text;
 	UIText.Font = Font;
-	UIText.Position = Position+BearCore::BearVector2<float>(5,2);
+	UIText.Position = Position+BearCore::BearVector2<float>(static_cast<float>(Font.GetHieght())/2.f,2);
 	UIText.Size.x = UIText.GetMaxSizeLine(*Text);
 	UIText.Size.y = static_cast<float>(Font.GetHieght());
-	Size.x = UIText.GetMaxSizeLine(*Text)+10;
+	Size.x = UIText.GetMaxSizeLine(*Text)+ static_cast<float>(Font.GetHieght());
 	Size.y =static_cast<float>( Font.GetHieght())+4;
 	
 	UIPlane.Color = Color;
