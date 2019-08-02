@@ -4,7 +4,7 @@ BearUI::Classic::BearUICheakBox::BearUICheakBox()
 {
 	PushItem(&UICheakBoxSwitch);
 	PushItem(&UIText);
-	UIText.Style.set(true, UIText.ST_CenterOfHeight);
+	//UIText.Style.set(true, UIText.ST_CenterOfHeight);
 
 	ColorPlaneBackground.Set(uint8(100), uint8(100), uint8(100));
 	ColorOff.Set(uint8(45), uint8(45), uint8(45));

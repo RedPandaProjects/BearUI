@@ -18,6 +18,7 @@ namespace BearUI
 			virtual void OnMessage(int32 message);
 			virtual void KillFocus();
 			virtual void Reset();
+			virtual bool OnKeyDown(BearInput::Key key);
 		private:
 			BearUITexture UIPlane;
 			BearUITexture UIPlaneBackgound;
