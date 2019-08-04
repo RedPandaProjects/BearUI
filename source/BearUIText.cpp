@@ -200,13 +200,13 @@ float BearUI::BearUIText::GetSizeLastLine(const bchar * text, bsize size) const
 }
 
 
-float BearUI::BearUIText::GetMaxHeightCharInLine(const bchar * text) const
+BearCore::BearVector2<float> BearUI::BearUIText::GetMaxHeightCharInLine(const bchar * text) const
 {
-	if (Font.Empty())return 0;
+	if (Font.Empty())return 	BearCore::BearVector2<float>();
 	auto&font = *Font.GetListChars();
 	bsize size = BearCore::BearString::GetSize(text);
 	BearCore::BearVector2<float> pos;
-	float max_y = 0;
+	BearCore::BearVector2<float> max_y ;
 	for (bsize i = 0; i < size; i++)
 	{
 		bchar16 ch_ = BearCore::BearEncoding::ToUTF16(text[i]);
@@ -238,7 +238,10 @@ float BearUI::BearUIText::GetMaxHeightCharInLine(const bchar * text) const
 			else
 			{
 				pos.x += item->second.Advance.x;
-				max_y = BearCore::bear_max(item->second.Size.y, max_y);
+				if (max_y.x <item->second.Size.y)
+				{
+					max_y.set(item->second.Size.y, item->second.Position.y);
+				}
 			}
 		}
 	}
@@ -258,11 +261,11 @@ void BearUI::BearUIText::Reset()
 
 	if (Font.Empty())return;
 	ShiftPosition.set(0, 0);
-	if (Style.test(ST_CenterOfHeight))
+/*	if (Style.test(ST_CenterOfHeight))
 	{
 		float  size_height =static_cast<float>( GetCountLine(*Text)*Font.GetHieght());
-		ShiftPosition.y =floorf( (Size.y) / 2 - size_height/2);
-	}
+		ShiftPosition.y =floorf( (Size.y- size_height) / 2);
+	}*/
 	if (Style.test(ST_CenterOfWidth))
 	{
 		float  size_width = GetMaxSizeLine(*Text);

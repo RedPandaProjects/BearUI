@@ -3,12 +3,12 @@ namespace BearUI
 {
 	namespace Classic
 	{
-		class BEARUI_API BearUIPGroupBox :public BearUIItem
+		class BEARUI_API BearUIGroupBox :public BearUIItem
 		{
-			BEAR_CLASS_NO_COPY(BearUIPGroupBox);
+			BEAR_CLASS_NO_COPY(BearUIGroupBox);
 		public:
-			BearUIPGroupBox();
-			~BearUIPGroupBox();
+			BearUIGroupBox();
+			~BearUIGroupBox();
 			BearFontRef Font;
 			BearCore::BearString Text;
 			BearCore::BearColor Color;

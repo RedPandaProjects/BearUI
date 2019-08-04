@@ -12,6 +12,7 @@
 #include "BearUI/BearUIStaticItem.h"
 #include "BearUI/BearUIItem.h"
 #include "BearUI/BearUITexture.h"
+#include "BearUI/BearUIRenderTarget.h"
 #include "BearUI/BearUIText.h"
 #include "BearUI/BearUITriangle.h"
 

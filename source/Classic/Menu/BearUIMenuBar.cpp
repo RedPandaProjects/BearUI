@@ -105,6 +105,6 @@ bool BearUI::Classic::BearUIMenuBar::OnMouse(float x, float y)
 
 void BearUI::Classic::BearUIMenuBar::KillFocus()
 {
-	printf("kill focus \r\n");
+	//printf("kill focus \r\n");
 	BearUIItem::KillFocus();
 }

@@ -49,9 +49,9 @@ namespace BearUI
 				StyleWithoutBackground()
 				{
 					ShowBackground = false;
-					Colors[A_Default][CT_Plane].Set(uint8(100), uint8(100), uint8(100));
-					Colors[A_MouseEnter][CT_Plane].Set(uint8(150), uint8(150), uint8(150));
-					Colors[A_MouseClick][CT_Plane].Set(uint8(200), uint8(200), uint8(200));
+					Colors[A_Default][CT_Plane].Set(uint8(70), uint8(70), uint8(70));
+					Colors[A_MouseEnter][CT_Plane].Set(uint8(100), uint8(100), uint8(100));
+					Colors[A_MouseClick][CT_Plane].Set(uint8(150), uint8(150), uint8(150));
 					Colors[A_Disable][CT_Plane].Set(uint8(200), uint8(200), uint8(200));
 				}
 			};
@@ -60,9 +60,9 @@ namespace BearUI
 				StyleWithoutBackgroundDark()
 				{
 					ShowBackground = false;
-					Colors[A_Default][CT_Plane].Set(uint8(60), uint8(60), uint8(60));
-					Colors[A_MouseEnter][CT_Plane].Set(uint8(100), uint8(100), uint8(100));
-					Colors[A_MouseClick][CT_Plane].Set(uint8(150), uint8(150), uint8(150));
+					Colors[A_Default][CT_Plane].Set(uint8(35), uint8(35), uint8(35));
+					Colors[A_MouseEnter][CT_Plane].Set(uint8(70), uint8(70), uint8(70));
+					Colors[A_MouseClick][CT_Plane].Set(uint8(100), uint8(100), uint8(100));
 					Colors[A_Disable][CT_Plane].Set(uint8(200), uint8(200), uint8(200));
 				}
 			};

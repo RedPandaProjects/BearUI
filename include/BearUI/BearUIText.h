@@ -34,7 +34,7 @@ namespace BearUI
 		float GetSizeLastLine(const bchar*text, bsize size)const;
 		virtual void Reset();
 	public:
-		float GetMaxHeightCharInLine(const bchar*text)const;
+		BearCore::BearVector2<float> GetMaxHeightCharInLine(const bchar*text)const;
 		virtual void Draw(BearUI * ui, BearCore::BearTime time);
 
 		virtual void Unload();

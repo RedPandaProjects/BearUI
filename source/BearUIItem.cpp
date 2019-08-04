@@ -248,7 +248,7 @@ bool BearUI::BearUIItem::OnKeyDown(BearInput::Key key)
 	else if(key == BearInput::KeyMouseRight)
 	{
 		OnMessage(M_MouseRClick);
-		return true;
+		//return true;
 	}
 	return false;
 }

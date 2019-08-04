@@ -8,18 +8,18 @@ namespace BearUI
 	public:
 		BearUI(bsize width, bsize height);
 
-		void Resize(bsize width, bsize height);
+		virtual void Resize(bsize width, bsize height);
 		void Draw(BearCore::BearTime time);
 		void Update(BearCore::BearTime time);
 		void Unload();
 		void Reload();
-		void Reset();
+		virtual	void Reset();
 		void KillFocus();
 
 		void OnMouse(float x,float y);
 		void OnKeyDown(BearInput::Key key);
 		void OnKeyUp(BearInput::Key key);
-
+		void UseEventViewport(BearEventViewport&ev);
 		void OnChar(bchar16 ch);
 
 		~BearUI();
@@ -41,6 +41,7 @@ namespace BearUI
 	private:
 #endif
 		void Render(BearUITexture*texture);
+		void Render(BearUIRenderTarget*texture);
 		void Render(BearUIText*text);
 		void RenderSelectZone(BearUIText*text);
 		void Render(BearUITriangle*triangle);

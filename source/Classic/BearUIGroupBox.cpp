@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::Classic::BearUIPGroupBox::BearUIPGroupBox()
+BearUI::Classic::BearUIGroupBox::BearUIGroupBox()
 {
 	UIText.Flags.set(false, UIText.UI_NoClip);
 	ColorBackground.Set(uint8(100), uint8(100), uint8(100));
@@ -8,11 +8,11 @@ BearUI::Classic::BearUIPGroupBox::BearUIPGroupBox()
 	ColorBackgroundFocused.Set(uint8(0), uint8(120), uint8(200));
 }
 
-BearUI::Classic::BearUIPGroupBox::~BearUIPGroupBox()
+BearUI::Classic::BearUIGroupBox::~BearUIGroupBox()
 {
 }
 
-void BearUI::Classic::BearUIPGroupBox::OnMessage(int32 message)
+void BearUI::Classic::BearUIGroupBox::OnMessage(int32 message)
 {
 	switch (message)
 	{
@@ -25,13 +25,13 @@ void BearUI::Classic::BearUIPGroupBox::OnMessage(int32 message)
 	BearUIItem::OnMessage(message);
 }
 
-void BearUI::Classic::BearUIPGroupBox::KillFocus()
+void BearUI::Classic::BearUIGroupBox::KillFocus()
 {
 	UIPlaneBackgound.Color = ColorBackground;
 	BearUIItem::KillFocus();
 }
 
-void BearUI::Classic::BearUIPGroupBox::Reset()
+void BearUI::Classic::BearUIGroupBox::Reset()
 {
 	PopItem(&UIPlane);
 	PopItem(&UIPlaneBackgound);
@@ -40,7 +40,7 @@ void BearUI::Classic::BearUIPGroupBox::Reset()
 	UIPlane.Rect = Rect;
 	UIPlane.Rect += BearCore::BearVector4<float>(1, 1, -2, -2);
 	UIText.Position = Position;
-	UIText.Position += BearCore::BearVector2<float>(static_cast<float>(Font.GetHieght())*0.333f, 1);
+	UIText.Position += BearCore::BearVector2<float>(roundf(static_cast<float>(Font.GetHieght())*0.333f), 1);
 	UIText.Clip = UIPlane.Rect;
 	UIText.Text = Text;
 	UIText.Font = Font;
@@ -52,7 +52,7 @@ void BearUI::Classic::BearUIPGroupBox::Reset()
 	BearUIItem::Reset();
 }
 
-bool BearUI::Classic::BearUIPGroupBox::OnKeyDown(BearInput::Key key)
+bool BearUI::Classic::BearUIGroupBox::OnKeyDown(BearInput::Key key)
 {
 	if (BearUIItem::OnKeyDown(key))
 	{

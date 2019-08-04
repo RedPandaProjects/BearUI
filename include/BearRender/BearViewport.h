@@ -30,7 +30,11 @@ namespace BearUI
 				float x;
 				float y;
 			} Position;
-		
+			struct
+			{
+				float width;
+				float height;
+			} Size;
 			bchar16 Char;
 		};
 		
@@ -46,7 +50,9 @@ namespace BearUI
 		enum TypeWindow
 		{
 			TW_POPUP = 1,
+			TW_ONLY_CLOSED=4,
 			TW_WIHTOUT_CLOSED = 2,
+			
 		};
 		BearViewport(bsize width = 0x400,bsize height=0x300,bool fullscreen=false, BearCore::BearFlags<int32> flags=0);
 		~BearViewport();
@@ -58,6 +64,9 @@ namespace BearUI
 		BearCore::BearVector2<float> GetMousePosition();
 		void SetMousePosition(const BearCore::BearVector2<float>&position);
 		bool GetEvent(BearEventViewport&e);
+		
+
+
 		inline
 #ifdef WINDOWS
 			HWND

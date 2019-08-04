@@ -94,7 +94,7 @@ void BearUI::BearUI::Resize(bsize width, bsize height)
 void BearUI::BearUI::Draw(BearCore::BearTime time)
 {
 
-
+	BearGraphics::BearRenderInterface::SetViewport(0, 0, m_screen.x, m_screen.y);
 	BearGraphics::BearRenderInterface::SetVertexState(BearGraphics::BearDefaultManager::GetVertexState(BearGraphics::DVS_UI));
 	BearGraphics::BearRenderInterface::SetRasterizerState(BearGraphics::BearDefaultManager::GetRasterizerState());
 	BearGraphics::BearRenderInterface::SetBlendState(BearGraphics::BearDefaultManager::GetBlendAlpha(), BearCore::BearColor::Transparent);
@@ -253,6 +253,35 @@ void BearUI::BearUI::OnKeyUp(BearInput::Key key)
 	}
 }
 
+void BearUI::BearUI::UseEventViewport(BearEventViewport & ev)
+{
+	switch (ev.Type)
+	{
+	case ::BearUI::EVT_Active:
+		KillFocus();
+		break;
+	case ::BearUI::EVT_Resize:
+		Resize(static_cast<bsize>(ev.Size.width), static_cast<bsize>(ev.Size.height));
+
+		break;
+	case ::BearUI::EVT_MouseMove:
+		OnMouse(ev.Position.x, ev.Position.y);
+		break;
+	case ::BearUI::EVT_KeyDown:
+		OnKeyDown(ev.Key);
+		break;
+	case ::BearUI::EVT_KeyUp:
+		OnKeyUp(ev.Key);
+		break;
+	case ::BearUI::EVT_Char:
+		OnChar(ev.Char);
+		break;
+	default:
+
+		break;
+	}
+}
+
 void BearUI::BearUI::OnChar(bchar16 ch)
 {
 	if (m_focus_item)
@@ -308,6 +337,40 @@ void BearUI::BearUI::Render(BearUITexture * texture)
 	BearGraphics::BearRenderInterface::DisableScissor();
 }
 
+void BearUI::BearUI::Render(BearUIRenderTarget * texture)
+{
+	if (!texture->Flags.test(BearUIStaticItem::UI_NoClip) && !texture->Clip.inZone(texture->Rect))
+	{
+		return;
+	}
+	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_UI));
+	BearGraphics::BearRenderInterface::SetPixelShader(BearGraphics::BearDefaultManager::GetPixelShader(BearGraphics::DPS_UITexture));
+
+
+	BearGraphics::BearRenderInterface::SetVertexShaderConstants(0, m_screen_constant);
+
+	if (texture->Flags.test(BearUIStaticItem::UI_NoClip))
+	{
+		BearGraphics::BearRenderInterface::DisableScissor();
+	}
+	else
+	{
+		BearGraphics::BearRenderInterface::SetScissor(texture->Clip.x, texture->Clip.y, texture->Clip.x + texture->Clip.x1, texture->Clip.y + texture->Clip.y1);
+	}
+
+	BearCore::bear_copy(reinterpret_cast<float*>(m_color_constant.Lock()), texture->Color.GetFloat().array, 4);
+	m_color_constant.Unlock();
+	BearGraphics::BearRenderInterface::SetPixelShaderConstants(0, m_color_constant);
+
+	BearGraphics::BearRenderInterface::SetPixelShaderResource(0, texture->RenderTarget, BearGraphics::BearDefaultManager::GetSamplerState());
+	BearCore::bear_copy(reinterpret_cast<BearGraphics::BearVertexDefault*>(m_vertex_buffer.Lock()), texture->m_vertex, 4);
+	m_vertex_buffer.Unlock();
+	BearGraphics::BearRenderInterface::SetVertexBuffer(m_vertex_buffer);
+	BearGraphics::BearRenderInterface::SetIndexBuffer(m_index_buffer);
+	BearGraphics::BearRenderInterface::DrawIndexed(6);
+	BearGraphics::BearRenderInterface::DisableScissor();
+}
+
 void BearUI::BearUI::Render(BearUIText * text)
 {
 	
@@ -345,11 +408,13 @@ void BearUI::BearUI::Render(BearUIText * text)
 	float up = 0;
 	if (text->Style.is(BearUIText::ST_CenterOfHeight))
 	{
-		up = text->GetMaxHeightCharInLine(*text->Text);
-		up = static_cast<float>(text->Font.GetHieght()) - up;
-		up /= 2.f;
-		up = floorf(up);
-		up = -up;
+		auto vec2 = text->GetMaxHeightCharInLine(*text->Text);
+		float temp = text->Size.y - vec2.x;
+	
+		temp =temp/ 2;
+		temp -= vec2.y;
+		up = roundf(temp);
+		//up = -up;
 	}
 	BearCore::BearVector4<float> TextureUV;
 
@@ -373,11 +438,12 @@ void BearUI::BearUI::Render(BearUIText * text)
 			pos.x = text->Position.x+ text->ShiftPosition.x;
 			if (text->Style.is(BearUIText::ST_CenterOfHeight))
 			{
-				up = text->GetMaxHeightCharInLine(*text->Text+i+1);
-				up = static_cast<float>(text->Font.GetHieght()) - up;
-				up /= 2.f;
-				up = floorf(up);
-				up = -up;
+				auto vec2 = text->GetMaxHeightCharInLine(*text->Text);
+				float temp = text->Size.y - vec2.x;
+
+				temp = temp / 2;
+				temp -= vec2.y;
+				up = roundf(temp);
 			}
 		}
 		else if (ch_ != TEXT('\r'))
@@ -393,11 +459,12 @@ void BearUI::BearUI::Render(BearUIText * text)
 					pos.x = text->Position.x;
 					if (text->Style.is(BearUIText::ST_CenterOfHeight))
 					{
-						up = text->GetMaxHeightCharInLine(*text->Text + i + 1);
-						up = static_cast<float>(text->Font.GetHieght()) - up;
-						up /= 2.f;
-						up = floorf(up);
-						up = -up;
+						auto vec2 = text->GetMaxHeightCharInLine(*text->Text);
+						float temp = text->Size.y - vec2.x;
+
+						temp = temp / 2;
+						temp -= vec2.y;
+						up = roundf(temp);
 					}
 				}
 
