@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::Classic::BearUIComboBox::BearUIComboBox() :SelectItem(-1), CallBack(0)
+BearUI::Classic::BearUIComboBox::BearUIComboBox() :SelectItem(-1), m_call_back(0), m_change(false)
 {
 	ColorPlaneBackground.Set(uint8(100), uint8(100), uint8(100));
 	ColorPlane.Set(uint8(20), uint8(20), uint8(20));
@@ -16,7 +16,25 @@ BearUI::Classic::BearUIComboBox::BearUIComboBox() :SelectItem(-1), CallBack(0)
 
 BearUI::Classic::BearUIComboBox::~BearUIComboBox()
 {
-	if (CallBack)CallBack->Destroy();
+	if (m_call_back)m_call_back->Destroy();
+}
+
+
+float BearUI::Classic::BearUIComboBox::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUIComboBox::CalcHeight() const
+{
+	return static_cast<float>(Font.GetMaxHieght()) + 2+4;
+}
+
+void BearUI::Classic::BearUIComboBox::Reload()
+{
+	UIListBox.Font = Font;
+	UIText.Font = Font;
+	BearUIItem::Reload();
 }
 
 void BearUI::Classic::BearUIComboBox::OnMessage(int32 message)
@@ -24,7 +42,7 @@ void BearUI::Classic::BearUIComboBox::OnMessage(int32 message)
 	switch (message)
 	{
 	case M_SelectItem:
-		if (CallBack)CallBack->Call<void>(CallBack_Class);
+		if (m_call_back)m_call_back->Call<void>(m_call_back_class);
 		break;
 	}
 	BearUIItem::OnMessage(message);
@@ -53,24 +71,24 @@ void BearUI::Classic::BearUIComboBox::Reset()
 	UIListBox.Size.set(Size.x, Size.y - size - 4);
 	UIListBox.Visible = true;
 
-	UIListBox.Items = Items;
-	UIListBox.Font = Font;
+	UIListBox.GetItems() = m_items;
+
 
 	UIText.Rect = UITextureBackground.Rect;
 	UIText.Size.x -= size + 4;
 	UIText.Rect += BearCore::BearVector4<float>(1, 1, -2, -2);
 	UIText.Clip = UIText.Rect;
 	UIText.Flags. AND (~UI_NoClip);
-	UIText.Font = Font;
+
 	UIText.Text = TEXT("");
-	if (static_cast<bint>(Items.size()) < SelectItem)
+	if (static_cast<bint>(m_items.size()) < SelectItem)
 	{
 		SelectItem = -1;
 		UIListBox.SelectItem = -1;
 	}
 	if (SelectItem >= 0)
 	{
-		UIText.Text = Items[SelectItem];
+		UIText.Text = m_items[SelectItem];
 		UIListBox.SelectItem = SelectItem;
 	}
 	BearUIItem::Reset();
@@ -82,6 +100,15 @@ void BearUI::Classic::BearUIComboBox::KillFocus()
 	BearUIItem::KillFocus();
 }
 
+void BearUI::Classic::BearUIComboBox::Update(BearCore::BearTime time)
+{
+	if (m_change)
+	{
+		m_change = false;
+		BearUIItem::Reset();
+	}
+}
+
 void BearUI::Classic::BearUIComboBox::CBButton()
 {
 	UIListBox.Visible = false;
@@ -91,7 +118,7 @@ void BearUI::Classic::BearUIComboBox::CBListBox()
 {
 	UIListBox.Visible = true;
 	SelectItem = UIListBox.SelectItem;
-	UIText.Text = Items[SelectItem];
+	UIText.Text = m_items[SelectItem];
 	UIText.Reset();
 	OnMessage(M_SelectItem);
 }

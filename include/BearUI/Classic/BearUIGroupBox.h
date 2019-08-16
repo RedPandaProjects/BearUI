@@ -14,11 +14,15 @@ namespace BearUI
 			BearCore::BearColor Color;
 			BearCore::BearColor ColorBackground;
 			BearCore::BearColor ColorBackgroundFocused;
+		private:
+			virtual float  CalcHeight() const;
+			virtual float  CalcWidth() const;
 		protected:
 			virtual void OnMessage(int32 message);
 			virtual void KillFocus();
 			virtual void Reset();
 			virtual bool OnKeyDown(BearInput::Key key);
+			virtual void Reload();
 		private:
 			BearUITexture UIPlane;
 			BearUITexture UIPlaneBackgound;

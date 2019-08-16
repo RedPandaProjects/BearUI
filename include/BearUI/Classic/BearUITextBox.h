@@ -18,7 +18,12 @@ namespace BearUI
 			{
 				S_richTextBox = 1
 			};
+			virtual float  CalcHeight() const;
+		private:
+			virtual float  CalcWidth() const;
+		
 		protected:
+			
 			virtual void OnMessage(int32 message);
 			virtual void Reset();
 			virtual bool OnChar(bchar16 ch);
@@ -27,6 +32,7 @@ namespace BearUI
 			virtual void KillFocus();
 			virtual void Update(BearCore::BearTime time);
 			virtual int32 GetCursor(float x,float y);
+			virtual void Reload();
 		private:
 			bool Key_PressShift;
 			bool Key_PressMouse;

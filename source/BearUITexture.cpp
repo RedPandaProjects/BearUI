@@ -9,6 +9,16 @@ BearUI::BearUITexture::~BearUITexture()
 {
 }
 
+float BearUI::BearUITexture::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::BearUITexture::CalcHeight() const
+{
+	return 0.0f;
+}
+
 void BearUI::BearUITexture::Draw(BearUI * ui, BearCore::BearTime time)
 {
 	if (Visible)return;

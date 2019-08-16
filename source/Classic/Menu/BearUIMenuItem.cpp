@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::Classic::BearUIMenuItem::BearUIMenuItem():Menu(0), CallBack(0)
+BearUI::Classic::BearUIMenuItem::BearUIMenuItem():Menu(0), m_call_back(0)
 {
 	PushItem(&UIText);
 	UITriangleSubMenu.Visible = true;
@@ -11,7 +11,17 @@ BearUI::Classic::BearUIMenuItem::BearUIMenuItem():Menu(0), CallBack(0)
 
 BearUI::Classic::BearUIMenuItem::~BearUIMenuItem()
 {
-	if (CallBack)CallBack->Destroy();
+	if (m_call_back)m_call_back->Destroy();
+}
+
+float BearUI::Classic::BearUIMenuItem::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUIMenuItem::CalcHeight() const
+{
+	return 0.0f;
 }
 
 void BearUI::Classic::BearUIMenuItem::OnMessage(int32 message)
@@ -36,8 +46,8 @@ void BearUI::Classic::BearUIMenuItem::OnMessage(int32 message)
 	case M_MouseLClick:
 		if (Menu)break;
 		if(Parent)	Parent->OnMessage(BearUIMenu::M_ItemClick);
-		if(CallBack)
-		CallBack->Call<void>(CallBack_Class);
+		if(m_call_back)
+		m_call_back->Call<void>(m_call_back_class);
 		break;
 	};
 	BearUIItem::OnMessage(message);
@@ -61,7 +71,7 @@ void BearUI::Classic::BearUIMenuItem::Reset()
 	}
 	if (Size.x == 0 || Size.y == 0)
 	{
-		float width = UIText.GetMaxSizeLine(*Text);
+		float width = BearUIText::GetWidth(Font,*Text);
 		float  height = static_cast<float>(Font.GetHieght());
 		Rect.x1 = width + 8;
 		Rect.y1 = height + 2;
@@ -107,4 +117,10 @@ void BearUI::Classic::BearUIMenuItem::KillFocus()
 bool BearUI::Classic::BearUIMenuItem::OnMouse(float x, float y)
 {
 	return BearUIItem::OnMouse(x,y);;
+}
+
+void BearUI::Classic::BearUIMenuItem::Reload()
+{
+	UIText.Font = Font;
+	BearUIItem::Reload();
 }

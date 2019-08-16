@@ -13,6 +13,10 @@ namespace BearUI
 			~BearUITreeNodeButton();
 			BearCore::BearColor Color;
 			BearCore::BearColor ColorSelect;
+
+		private:
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
 			virtual void OnMessage(int32 message);
 			virtual void Reset();

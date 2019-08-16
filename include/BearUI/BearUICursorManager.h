@@ -31,7 +31,7 @@ namespace BearUI
 		virtual void Unload();
 		virtual void Reload();
 	private:
-		BearCore::BearMap<int32, BearCore::BearMemoryRef<BearUICursorBase>> MapCursors;
-		BearViewport*CurentViewport;
+		BearCore::BearMap<int32, BearCore::BearMemoryRef<BearUICursorBase>> m_cursors;
+		BearViewport*m_curent_viewport;
 	};
 }

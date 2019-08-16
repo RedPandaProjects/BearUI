@@ -37,7 +37,11 @@ namespace BearUI
 			{
 				ScrollZoneView = zoneView;
 				Reset();
-			}
+			}	
+		
+		private:
+				virtual float  CalcWidth() const;
+				virtual float  CalcHeight() const;
 		protected:
 			enum EMessage
 			{

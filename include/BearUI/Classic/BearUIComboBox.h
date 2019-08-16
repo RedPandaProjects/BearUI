@@ -11,7 +11,7 @@ namespace BearUI
 		public:
 			BearUIComboBox();
 			~BearUIComboBox();
-			BearCore::BearVector<BearCore::BearString> Items;
+		
 			BearCore::BearColor ColorPlaneBackground;
 			BearCore::BearColor ColorPlane;
 			bint SelectItem;
@@ -19,10 +19,16 @@ namespace BearUI
 			template<class CL, typename F>
 			inline void SetCallback(CL*cl, F f)
 			{
-				CallBack = BearCore::bear_create_class_function_ref(f);
-				CallBack_Class = reinterpret_cast<void*>(cl);
+				m_call_back = BearCore::bear_create_class_function_ref(f);
+				m_call_back_class = reinterpret_cast<void*>(cl);
 			}
+			inline 	BearCore::BearVector<BearCore::BearString>&GetItems() { m_change = true; return m_items; }
+			inline 	const BearCore::BearVector<BearCore::BearString>&GetItems()const { return m_items; }
+			virtual float  CalcHeight() const;
+		private:
+			virtual float  CalcWidth() const;
 		protected:
+			virtual void Reload();
 			enum EMessage
 			{
 				M_SelectItem,
@@ -30,7 +36,10 @@ namespace BearUI
 			virtual void OnMessage(int32 message);
 			virtual void Reset();
 			virtual void KillFocus();
+			virtual void Update(BearCore::BearTime time);
 		private:
+			BearCore::BearVector<BearCore::BearString> m_items;
+			bool m_change;
 			void CBButton();
 			void CBListBox();
 			BearUIListBox UIListBox;
@@ -38,8 +47,8 @@ namespace BearUI
 			BearUITexture UITexture;
 			BearUITexture UITextureBackground;
 			BearUIText UIText;
-			BearCore::BearClassFunctionRef*CallBack;
-			void*CallBack_Class;
+			BearCore::BearClassFunctionRef*m_call_back;
+			void*m_call_back_class;
 		};
 	}
 }

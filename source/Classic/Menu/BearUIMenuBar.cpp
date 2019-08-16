@@ -26,10 +26,23 @@ BearUI::Classic::BearUIMenu & BearUI::Classic::BearUIMenuBar::Add(const bchar * 
 	return *Menu;
 }
 
-float BearUI::Classic::BearUIMenuBar::GetHeight()
+float BearUI::Classic::BearUIMenuBar::CalcWidth() const
 {
-	return static_cast<float>(Font.GetHieght())+8;
+	float result = 0;
+	for (auto b = UIMenuItems.begin(), e = UIMenuItems.end(); b != e; b++)
+	{
+	
+		result += (*b)->CalcWidth();
+	}
+	return result;
 }
+
+float BearUI::Classic::BearUIMenuBar::CalcHeight() const
+{
+	return static_cast<float>(Font.GetHieght()) + 8;
+}
+
+
 
 void BearUI::Classic::BearUIMenuBar::OnMessage(int32 message)
 {
@@ -53,12 +66,11 @@ void BearUI::Classic::BearUIMenuBar::Reset()
 		(*b)->Color = Color;
 		(*b)->Menu->Color = Color;;
 		(*b)->Menu->Parent = this;
-		(*b)->Reset();
 		(*b)->Position = position;
-		position.x+=(*b)->Size.x;
+		position.x += (*b)->CalcHeight();
 		PushItem(**b);
 	}
-	Rect.y1 = GetHeight();
+	Rect.y1 = CalcHeight();
 	UIPlane.Rect = Rect;
 	UIPlane.Color = ColorBackground;
 	PushItem(&UIPlane);
@@ -107,4 +119,13 @@ void BearUI::Classic::BearUIMenuBar::KillFocus()
 {
 	//printf("kill focus \r\n");
 	BearUIItem::KillFocus();
+}
+
+void BearUI::Classic::BearUIMenuBar::Reload()
+{
+	for (auto b = UIMenuItems.begin(), e = UIMenuItems.end(); b != e; b++)
+	{
+		(*b)->Font = Font;
+	}
+	BearUIItem::Reload();
 }

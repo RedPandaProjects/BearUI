@@ -11,6 +11,16 @@ BearUI::Classic::BearUITreeNodeButton::~BearUITreeNodeButton()
 {
 }
 
+float BearUI::Classic::BearUITreeNodeButton::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUITreeNodeButton::CalcHeight() const
+{
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUITreeNodeButton::OnMessage(int32 message)
 {
 	switch (message)

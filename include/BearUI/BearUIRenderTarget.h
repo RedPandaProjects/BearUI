@@ -9,6 +9,10 @@ namespace BearUI
 		BearUIRenderTarget();
 		~BearUIRenderTarget();
 	public:
+		enum EFlags
+		{
+			F_Alpha=1
+		};
 		BearCore::BearVector4<float> TextureUV;
 		BearGraphics::BearRenderTargetViewRef RenderTarget;
 		BearCore::BearColor Color;

@@ -9,6 +9,16 @@ BearUI::Classic::BearUIMenuBarItem::~BearUIMenuBarItem()
 {
 }
 
+float BearUI::Classic::BearUIMenuBarItem::CalcWidth() const
+{
+	return UIText.CalcWidth() + static_cast<float>(Font.GetHieght());
+}
+
+float BearUI::Classic::BearUIMenuBarItem::CalcHeight() const
+{
+	return static_cast<float>(Font.GetHieght()) + 4;
+}
+
 void BearUI::Classic::BearUIMenuBarItem::Update(BearCore::BearTime time)
 {
 	BearUIItem::Update(time);
@@ -42,12 +52,11 @@ void BearUI::Classic::BearUIMenuBarItem::OnMessage(int32 message)
 void BearUI::Classic::BearUIMenuBarItem::Reset()
 {
 	PopItems();
-	UIText.Text = Text;
-	UIText.Font = Font;
+
 	UIText.Position = Position+BearCore::BearVector2<float>(static_cast<float>(Font.GetHieght())/2.f,2);
-	UIText.Size.x = UIText.GetMaxSizeLine(*Text);
+	UIText.Size.x = UIText.CalcWidth();
 	UIText.Size.y = static_cast<float>(Font.GetHieght());
-	Size.x = UIText.GetMaxSizeLine(*Text)+ static_cast<float>(Font.GetHieght());
+	Size.x = UIText.Size.x + static_cast<float>(Font.GetHieght());
 	Size.y =static_cast<float>( Font.GetHieght())+4;
 	
 	UIPlane.Color = Color;
@@ -81,6 +90,17 @@ void BearUI::Classic::BearUIMenuBarItem::KillFocus()
 	UIPlane.Visible = true;
 	UIPlaneBcackground.Visible = true;
 	BearUIItem::KillFocus();
+}
+
+void BearUI::Classic::BearUIMenuBarItem::Reload()
+{
+	UIText.Text = Text;
+	UIText.Font = Font;
+	if (Menu)
+	{
+		Menu->Font = Font;
+	}
+	BearUIItem::Reload();
 }
 
 

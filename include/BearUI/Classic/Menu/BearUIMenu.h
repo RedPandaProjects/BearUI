@@ -18,6 +18,9 @@ namespace BearUI
 			BearUIMenuItem&Add(const bchar*Text);
 			void AddBorder();
 			BearUIMenu&AddMenu(const bchar*Text);
+			virtual float  CalcWidth() const;
+		private:
+			virtual float  CalcHeight() const;
 		protected:
 			enum EMessage
 			{
@@ -29,6 +32,7 @@ namespace BearUI
 	
 			virtual bool OnMouse(float x, float y);
 			virtual void Reset();
+			virtual void Reload();
 		private:
 			BearUITexture UIPlane;
 			BearUITexture UIBackgroundPlane;

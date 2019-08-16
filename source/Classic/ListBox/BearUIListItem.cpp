@@ -21,6 +21,16 @@ float BearUI::Classic::BearUIListItem::GetHieght(const BearFontRef & font)
 	return static_cast<float>(font.GetHieght()) + 2;
 }
 
+float BearUI::Classic::BearUIListItem::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUIListItem::CalcHeight() const
+{
+	return 0.0f;
+}
+
 
 void BearUI::Classic::BearUIListItem::Update(BearCore::BearTime time)
 {
@@ -92,5 +102,11 @@ void BearUI::Classic::BearUIListItem::KillFocus()
 	}
 	BearUIItem::KillFocus();
 //	UITexture.Color = Color;
+}
+
+void BearUI::Classic::BearUIListItem::Reload()
+{
+	UIText.Font = Font;
+	BearUIItem::Reload();
 }
 

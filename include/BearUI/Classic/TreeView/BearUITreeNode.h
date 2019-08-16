@@ -22,7 +22,10 @@ namespace BearUI
 			const BearUITreeNode*Find(const bchar*text)const;
 
 			BearUITreeNode&Add(const bchar*text);
-			inline float GetHeight()const { return Height; }
+			virtual float  CalcHeight() const;
+		private:
+			virtual float  CalcWidth() const;
+		
 		protected:
 			BearUITreeView*Parent;
 
@@ -40,6 +43,7 @@ namespace BearUI
 			virtual bool OnKeyDown(BearInput::Key key);
 			void PushNodesToParent();
 			void NodesWrap();
+			virtual void Reload();
 		private:
 			float WidthShift;
 			bool Deployed;

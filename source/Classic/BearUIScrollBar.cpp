@@ -17,6 +17,16 @@ BearUI::Classic::BearUIScrollBar::~BearUIScrollBar()
 	if (CallBack)CallBack->Destroy();
 }
 
+float BearUI::Classic::BearUIScrollBar::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUIScrollBar::CalcHeight() const
+{
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUIScrollBar::OnMessage(int32 message)
 {
 	switch (message)

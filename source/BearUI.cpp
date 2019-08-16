@@ -343,6 +343,8 @@ void BearUI::BearUI::Render(BearUIRenderTarget * texture)
 	{
 		return;
 	}
+	if (!texture->Flags.test(BearUIRenderTarget::F_Alpha))
+		BearGraphics::BearRenderInterface::SetBlendState(BearGraphics::BearDefaultManager::GetBlend(), BearCore::BearColor::Transparent);
 	BearGraphics::BearRenderInterface::SetVertexShader(BearGraphics::BearDefaultManager::GetVertexShader(BearGraphics::DVS_UI));
 	BearGraphics::BearRenderInterface::SetPixelShader(BearGraphics::BearDefaultManager::GetPixelShader(BearGraphics::DPS_UITexture));
 
@@ -369,6 +371,9 @@ void BearUI::BearUI::Render(BearUIRenderTarget * texture)
 	BearGraphics::BearRenderInterface::SetIndexBuffer(m_index_buffer);
 	BearGraphics::BearRenderInterface::DrawIndexed(6);
 	BearGraphics::BearRenderInterface::DisableScissor();
+
+	if(!texture->Flags.test(BearUIRenderTarget::F_Alpha))
+	BearGraphics::BearRenderInterface::SetBlendState(BearGraphics::BearDefaultManager::GetBlendAlpha(), BearCore::BearColor::Transparent);
 }
 
 void BearUI::BearUI::Render(BearUIText * text)
@@ -408,7 +413,7 @@ void BearUI::BearUI::Render(BearUIText * text)
 	float up = 0;
 	if (text->Style.is(BearUIText::ST_CenterOfHeight))
 	{
-		auto vec2 = text->GetMaxHeightCharInLine(*text->Text);
+		auto vec2 = BearUIText::GetMaxHeightCharInLine(text->Font,*text->Text,static_cast<BearUIText::EStyleText>(*text->Style));
 		float temp = text->Size.y - vec2.x;
 	
 		temp =temp/ 2;
@@ -438,7 +443,7 @@ void BearUI::BearUI::Render(BearUIText * text)
 			pos.x = text->Position.x+ text->ShiftPosition.x;
 			if (text->Style.is(BearUIText::ST_CenterOfHeight))
 			{
-				auto vec2 = text->GetMaxHeightCharInLine(*text->Text);
+				auto vec2 = BearUIText::GetMaxHeightCharInLine(text->Font, *text->Text, static_cast<BearUIText::EStyleText>(*text->Style));
 				float temp = text->Size.y - vec2.x;
 
 				temp = temp / 2;
@@ -459,7 +464,7 @@ void BearUI::BearUI::Render(BearUIText * text)
 					pos.x = text->Position.x;
 					if (text->Style.is(BearUIText::ST_CenterOfHeight))
 					{
-						auto vec2 = text->GetMaxHeightCharInLine(*text->Text);
+						auto vec2 = BearUIText::GetMaxHeightCharInLine(text->Font, *text->Text, static_cast<BearUIText::EStyleText>(*text->Style));
 						float temp = text->Size.y - vec2.x;
 
 						temp = temp / 2;

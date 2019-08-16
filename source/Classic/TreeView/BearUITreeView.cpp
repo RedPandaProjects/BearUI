@@ -7,15 +7,33 @@ BearUI::Classic::BearUITreeView::BearUITreeView():ScrollBarHeight(0)
 	ColorPlane.Set(uint8(20), uint8(20), uint8(20));
 	ColorSelect.Set(uint8(67), uint8(67), uint8(67));
 	ColorSelectFocus.Set(uint8(0), uint8(120), uint8(200));
-	CallBack = 0;
+	m_call_back = 0;
 	UIScrollBar.Visible = true;
 	bUpdateScrollBar =true;
 }
 
 BearUI::Classic::BearUITreeView::~BearUITreeView()
 {
-	if(CallBack)
-	CallBack->Destroy();
+	if(m_call_back)
+	m_call_back->Destroy();
+}
+
+float BearUI::Classic::BearUITreeView::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUITreeView::CalcHeight() const
+{
+	return 0.0f;
+}
+
+void BearUI::Classic::BearUITreeView::Reload()
+{
+	for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
+	{
+		(*b)->Font = Font;
+	}
 }
 
 void BearUI::Classic::BearUITreeView::Reset()
@@ -51,7 +69,7 @@ void BearUI::Classic::BearUITreeView::Reset()
 		for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
 		{
 			(*b)->Update(BearCore::BearTime());
-			Height += (*b)->GetHeight();
+			Height += (*b)->CalcHeight();
 		}
 		UIScrollBar.ScrollZoneView = Rect.y1 / (Height);
 	}
@@ -117,7 +135,7 @@ void BearUI::Classic::BearUITreeView::Update(BearCore::BearTime time)
 		(*b)->Size = size;
 		(*b)->Clip = clip;
 		(*b)->Update(time);
-		Height += (*b)->GetHeight();
+		Height += (*b)->CalcHeight();
 	}
 	BearUIItem::Update(time);
 }
@@ -127,7 +145,7 @@ void BearUI::Classic::BearUITreeView::OnMessage(int32 message)
 	switch (message)
 	{
 	case M_ClickSelect:
-		if (CallBack)CallBack->Call<void>(CallBack_Class, Select);
+		if (m_call_back)m_call_back->Call<void>(m_call_back_class, Select);
 		break;
 	case M_UpdateScrollBar:
 		bUpdateScrollBar = true;
@@ -146,7 +164,7 @@ void BearUI::Classic::BearUITreeView::UpdateScrollBar()
 	for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
 	{
 		(*b)->Update(BearCore::BearTime());
-		Height += (*b)->GetHeight();
+		Height += (*b)->CalcHeight();
 	}
 	UIScrollBar.ScrollOne = static_cast<float>(Font.GetHieght()) / (Height);
 	UIScrollBar.SetZoneView ( Rect.y1 / (Height));
@@ -173,7 +191,7 @@ bool BearUI::Classic::BearUITreeView::ViewedAll()
 		(*b)->Size = Size;
 		(*b)->Clip = Clip;
 		(*b)->Update(BearCore::BearTime());
-		Height += (*b)->GetHeight();
+		Height += (*b)->CalcHeight();
 	}
 
 	return Height <= Rect.y1 - 2;

@@ -42,6 +42,22 @@ BearUI::Classic::BearUIMenu & BearUI::Classic::BearUIMenu::AddMenu(const bchar *
 	return *Menu;
 }
 
+float BearUI::Classic::BearUIMenu::CalcWidth() const
+{
+	float  width = static_cast<float>(Font.GetHieght()) * 5;;
+	for (auto b = UIItems.begin(), e = UIItems.end(); b != e; b++)
+	{
+		width = BearCore::bear_max((*b)->UIText.CalcWidth(), width);
+
+	}
+	return width+6;
+}
+
+float BearUI::Classic::BearUIMenu::CalcHeight() const
+{
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUIMenu::OnMessage(int32 message)
 {
 	switch (message)
@@ -80,7 +96,7 @@ void BearUI::Classic::BearUIMenu::Reset()
 	auto color = Color;
 	color.Set(uint8(color.GetUint8().x + 27), uint8(color.GetUint8().y + 27), uint8(color.GetUint8().x1 + 27));
 	UIBackgroundPlane.Color.Set(uint8(color.GetUint8().x + 27), uint8(color.GetUint8().y + 27), uint8(color.GetUint8().x1 + 27));
-	bsize max_size_text = 0;
+	/*bsize max_size_text = 0;
 	for(auto b = UIItems.begin(), e = UIItems.end(); b != e; b++)
 	{
 		if ((*b)->Menu)
@@ -93,17 +109,16 @@ void BearUI::Classic::BearUIMenu::Reset()
 		}
 		
 	}
-
+	*/
 	for (auto b = UIItems.begin(), e = UIItems.end(); b != e; b++)
 	{
 		(*b)->Font = Font;
 		(*b)->Color = color;
 		(*b)->UIText.Reset();
-		width = BearCore::bear_max((*b)->UIText.GetMaxSizeLine(*(*b)->Text), width);
 
 	}	
 	height += 2;
-	Size.x = width+6;
+	Size.x = CalcWidth();
 	Size.y = 4;
 	auto position = Position;
 	position.x += 3;
@@ -148,4 +163,14 @@ void BearUI::Classic::BearUIMenu::Reset()
 	UIBackgroundPlane.Rect = Rect;
 	PushItem(&UIBackgroundPlane);
 	BearUIItem::Reset();
+}
+
+void BearUI::Classic::BearUIMenu::Reload()
+{
+	for (auto b = UIItems.begin(), e = UIItems.end(); b != e; b++)
+	{
+		(*b)->Font = Font;
+
+	}
+	BearUIItem::Reload();
 }

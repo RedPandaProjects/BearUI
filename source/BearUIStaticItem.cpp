@@ -8,6 +8,17 @@ BearUI::BearUIStaticItem::~BearUIStaticItem()
 {
 } 
 
+
+float BearUI::BearUIStaticItem::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::BearUIStaticItem::CalcHeight() const
+{
+	return 0.0f;
+}
+
 void BearUI::BearUIStaticItem::Draw(BearUI * ui, BearCore::BearTime time)
 {
 }

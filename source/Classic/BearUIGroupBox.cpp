@@ -12,6 +12,16 @@ BearUI::Classic::BearUIGroupBox::~BearUIGroupBox()
 {
 }
 
+float BearUI::Classic::BearUIGroupBox::CalcHeight() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUIGroupBox::CalcWidth() const
+{
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUIGroupBox::OnMessage(int32 message)
 {
 	switch (message)
@@ -42,8 +52,7 @@ void BearUI::Classic::BearUIGroupBox::Reset()
 	UIText.Position = Position;
 	UIText.Position += BearCore::BearVector2<float>(roundf(static_cast<float>(Font.GetHieght())*0.333f), 1);
 	UIText.Clip = UIPlane.Rect;
-	UIText.Text = Text;
-	UIText.Font = Font;
+	
 	UIPlaneBackgound.Color = ColorBackground;
 	UIPlane.Color = Color;
 	PushItem(&UIText);
@@ -60,4 +69,11 @@ bool BearUI::Classic::BearUIGroupBox::OnKeyDown(BearInput::Key key)
 		return true;
 	}
 	return false;
+}
+
+void BearUI::Classic::BearUIGroupBox::Reload()
+{
+	UIText.Text = Text;
+	UIText.Font = Font;
+	BearUIItem::Reload();
 }

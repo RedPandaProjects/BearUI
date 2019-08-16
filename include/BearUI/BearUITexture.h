@@ -8,6 +8,9 @@ namespace BearUI
 	public:
 		BearUITexture();
 		~BearUITexture();
+	private:
+		virtual float  CalcWidth() const;
+		virtual float  CalcHeight() const;
 	public:
 		BearCore::BearVector4<float> TextureUV;
 		BearGraphics::BearTexture2DRef Texture;

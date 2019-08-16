@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::Classic::BearUICursorText::BearUICursorText(bsize sizeText):SizeText(sizeText)
+BearUI::Classic::BearUICursorText::BearUICursorText(bsize sizeText):m_size_text(sizeText)
 {
 	
 
@@ -10,16 +10,26 @@ BearUI::Classic::BearUICursorText::~BearUICursorText()
 {
 }
 
+float BearUI::Classic::BearUICursorText::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUICursorText::CalcHeight() const
+{
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUICursorText::Draw(BearUI * ui, BearCore::BearTime time)
 {
-	float SizeChunk =static_cast<float>( SizeText / 6);
-	float Width = static_cast<float>(SizeText / 16);;
-	float Height = static_cast<float>(SizeText);
+	float SizeChunk =static_cast<float>( m_size_text / 6);
+	float Width = static_cast<float>(m_size_text / 16);;
+	float Height = static_cast<float>(m_size_text);
 	if (Width == 0)
 	{
 		Width = 1;
 	}
-	if (SizeText %2==0)
+	if (m_size_text %2==0)
 	{
 		Height += 1;
 	}

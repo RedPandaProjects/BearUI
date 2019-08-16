@@ -1,12 +1,13 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIItem::BearUIItem():m_mouse_enter(false), Focus(0), m_focus_item(0), Enable(true), UI(0)
+BearUI::BearUIItem::BearUIItem():m_mouse_enter(false), m_focus(0), m_focus_item(0), Enable(true), UI(0)
 {
 }
 
 BearUI::BearUIItem::~BearUIItem()
 {
 }
+
 
 void BearUI::BearUIItem::PushItem(BearUIItem * item)
 {
@@ -156,7 +157,7 @@ void BearUI::BearUIItem::OnMessage(int32 message)
 bool BearUI::BearUIItem::OnMouse(float x, float y)
 {
 	if (Visible)return false;
-	MouseLastPosition.set(x, y);
+	m_mouse_last_position.set(x, y);
 	if (m_focus_item)
 		if (m_focus_item->OnMouse(x, y))
 		{
@@ -225,7 +226,7 @@ bool BearUI::BearUIItem::OnKeyDown(BearInput::Key key)
 	{
 		if ((*b)->OnKeyDown(key))
 		{
-			Focus = true;
+			m_focus = true;
 			m_focus_item = *b;
 			UpdateFocus();
 			return true;
@@ -236,13 +237,13 @@ bool BearUI::BearUIItem::OnKeyDown(BearInput::Key key)
 	{
 		if (m_mouse_enter)
 		{
-			Focus = true;
+			m_focus = true;
 			OnMessage(M_MouseLClick);
 			return true;
 		}
 		else
 		{
-			Focus = false;
+			m_focus = false;
 		}
 	}
 	else if(key == BearInput::KeyMouseRight)
@@ -309,7 +310,7 @@ void BearUI::BearUIItem::Reset()
 
 void BearUI::BearUIItem::KillFocus()
 {
-	Focus = false;
+	m_focus = false;
 	m_focus_item = 0;
 	auto b = m_items.begin();
 	auto e = m_items.end();
@@ -409,10 +410,6 @@ int32 BearUI::BearUIItem::GetCursor(float x,float y)
 	return 0;
 }
 
-bool BearUI::BearUIItem::MouseEntered()
-{
-	return m_mouse_enter;
-}
 
 void BearUI::BearUIItem::UpdateFocus()
 {
@@ -420,7 +417,7 @@ void BearUI::BearUIItem::UpdateFocus()
 	auto e = m_items.end();
 	while (b != e)
 	{
-		if (*b != m_focus_item) { (*b)->Focus = false; (*b)->KillFocus(); }
+		if (*b != m_focus_item) { (*b)->m_focus = false; (*b)->KillFocus(); }
 		b++;
 	}
 }

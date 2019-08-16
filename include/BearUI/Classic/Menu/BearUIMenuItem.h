@@ -17,6 +17,9 @@ namespace BearUI
 			BearCore::BearColor Color;
 			BearCore::BearString Text;
 			BearFontRef Font;
+		private:
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
 			enum EFlags
 			{
@@ -33,14 +36,15 @@ namespace BearUI
 			template<class CL, typename F>
 			inline void SetCallback(CL*cl, F f)
 			{
-				if (CallBack)CallBack->Destroy();
-				CallBack = BearCore::bear_create_class_function_ref(f);
-				CallBack_Class = reinterpret_cast<void*>(cl);
+				if (m_call_back)m_call_back->Destroy();
+				m_call_back = BearCore::bear_create_class_function_ref(f);
+				m_call_back_class = reinterpret_cast<void*>(cl);
 			}
 			virtual bool OnMouse(float x, float y);
+			virtual void Reload();
 		private:
-			BearCore::BearClassFunctionRef*CallBack;
-			void*CallBack_Class;
+			BearCore::BearClassFunctionRef*m_call_back;
+			void*m_call_back_class;
 			BearUIMenu*Menu;
 			BearUIMenu*Parent;
 			BearUIText    UIText;

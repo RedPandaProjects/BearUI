@@ -16,6 +16,9 @@ namespace BearUI
 			BearCore::BearColor ColorOffSelect;
 			bool Switch;
 			BearCore::BearColor ColorPlaneBackground;
+		private:
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
 			virtual void OnMessage(int32 message);
 			virtual void Reset();

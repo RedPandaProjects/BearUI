@@ -4,7 +4,7 @@ BearUI::Classic::BearUICheakBox::BearUICheakBox()
 {
 	PushItem(&UICheakBoxSwitch);
 	PushItem(&UIText);
-	//UIText.Style.set(true, UIText.ST_CenterOfHeight);
+	UIText.Style.set(true, UIText.ST_OneLine);
 
 	ColorPlaneBackground.Set(uint8(100), uint8(100), uint8(100));
 	ColorOff.Set(uint8(45), uint8(45), uint8(45));
@@ -22,6 +22,23 @@ void BearUI::Classic::BearUICheakBox::Switch(bool Switch)
 	if (UICheakBoxSwitch.Switch != Switch) { UICheakBoxSwitch.Switch = Switch; UICheakBoxSwitch.Reset(); }
 }
 
+float BearUI::Classic::BearUICheakBox::CalcWidth() const
+{
+	return 4 + static_cast<float>(Font.GetHieght()) + BearUIText::GetWidth(Font, *Text, 0, BearUIText::ST_OneLine);
+}
+
+float BearUI::Classic::BearUICheakBox::CalcHeight() const
+{
+	return  static_cast<float>(Font.GetHieght());
+}
+
+void BearUI::Classic::BearUICheakBox::Reload()
+{
+	UIText.Font = Font;
+	UIText.Text = Text;
+	BearUIItem::Reload();
+}
+
 void BearUI::Classic::BearUICheakBox::Reset()
 {
 	float hw= static_cast<float>(Font.GetHieght());
@@ -34,11 +51,11 @@ void BearUI::Classic::BearUICheakBox::Reset()
 	UICheakBoxSwitch.Position = Position;
 	UICheakBoxSwitch.Size.set(hw, hw);
 	UIText.Position.set(Position.x + hw + 4, Position.y);
-	UIText.Font = Font;
-	Size.x =4+hw +UIText.GetMaxSizeLine(*Text);
+
+	Size.x =4+hw + BearUIText::GetWidth(Font, *Text, 0, BearUIText::ST_OneLine);
 	UIText.Size.y = hw;
-	UIText.Size.x = UIText.GetMaxSizeLine(*Text);;
-	UIText.Text = Text;
+	UIText.Size.x = BearUIText::GetWidth(Font, *Text, 0, BearUIText::ST_OneLine);
+	
 	BearUIItem::Reset();
 }
 

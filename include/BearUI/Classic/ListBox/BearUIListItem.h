@@ -20,8 +20,9 @@ namespace BearUI
 
 			BearFontRef Font;
 			static float GetHieght(const BearFontRef&font);
-
-
+		private:
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
 			BearUIListBox*Parent;
 			virtual void Update(BearCore::BearTime time);
@@ -32,6 +33,7 @@ namespace BearUI
 			virtual void OnMessage(int32 message);
 			virtual void Reset();
 			virtual void KillFocus();
+			virtual void Reload();
 		private:
 			BearUIText UIText;
 			BearUITexture UIPlane;

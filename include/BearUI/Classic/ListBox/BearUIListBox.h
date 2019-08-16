@@ -12,7 +12,7 @@ namespace BearUI
 		public:
 			BearUIListBox();
 			~BearUIListBox();
-			BearCore::BearVector<BearCore::BearString> Items;
+
 			bint SelectItem;
 
 			BearCore::BearColor ColorPlaneBackground;
@@ -22,25 +22,32 @@ namespace BearUI
 
 			BearFontRef Font;
 
-
 			template<class CL, typename F>
 			inline void SetCallback(CL*cl, F f)
 			{
-				CallBack = BearCore::bear_create_class_function_ref(f);
-				CallBack_Class = reinterpret_cast<void*>(cl);
+				m_call_back = BearCore::bear_create_class_function_ref(f);
+				m_call_back_class = reinterpret_cast<void*>(cl);
 			}
-			virtual void Reset();
+			inline 	BearCore::BearVector<BearCore::BearString>&GetItems() { m_change = true; return m_items; }
+			inline 	const BearCore::BearVector<BearCore::BearString>&GetItems()const { return m_items; }
 		protected:
 			enum EMessage
 			{
 				M_SelectedItem = 0x100,
 			};
 			virtual void OnMessage(int32 message);
-	
 		private:
-
-			BearCore::BearClassFunctionRef*CallBack;
-			void*CallBack_Class;
+			virtual float  CalcHeight() const;
+			virtual float  CalcWidth() const;
+		protected:
+			virtual void Update(BearCore::BearTime time);
+			virtual void Reset();
+			virtual void Reload();
+		private:
+			BearCore::BearVector<BearCore::BearString> m_items;
+			bool m_change;
+			BearCore::BearClassFunctionRef*m_call_back;
+			void*m_call_back_class;
 			void CBScrollBar();
 			BearCore::BearVector<BearCore::BearMemoryRef<BearUIListItem>> UIItems;
 			BearUITexture UIPlaneBackground;

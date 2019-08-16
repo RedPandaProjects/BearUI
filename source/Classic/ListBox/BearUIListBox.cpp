@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::Classic::BearUIListBox::BearUIListBox(): SelectItem(-1), CallBack(0)
+BearUI::Classic::BearUIListBox::BearUIListBox(): SelectItem(-1), m_call_back(0), m_change(false)
 {
 	ColorPlaneBackground.Set(uint8(100), uint8(100), uint8(100));
 	ColorPlane.Set(uint8(20), uint8(20), uint8(20));
@@ -11,7 +11,7 @@ BearUI::Classic::BearUIListBox::BearUIListBox(): SelectItem(-1), CallBack(0)
 
 BearUI::Classic::BearUIListBox::~BearUIListBox()
 {
-	if (CallBack)CallBack->Destroy();
+	if (m_call_back)m_call_back->Destroy();
 }
 
 
@@ -20,10 +20,29 @@ void BearUI::Classic::BearUIListBox::OnMessage(int32 message)
 	switch (message)
 	{
 	case M_SelectedItem:
-		if (CallBack)CallBack->Call<void>(CallBack_Class);
+		if (m_call_back)m_call_back->Call<void>(m_call_back_class);
 		break;
 	}
 	BearUIItem::OnMessage(message);
+}
+
+float BearUI::Classic::BearUIListBox::CalcHeight() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUIListBox::CalcWidth() const
+{
+	return 0.0f;
+}
+
+void BearUI::Classic::BearUIListBox::Update(BearCore::BearTime time)
+{
+	if (m_change)
+	{
+		Reset();
+		m_change = false;
+	}
 }
 
 void BearUI::Classic::BearUIListBox::Reset()
@@ -31,7 +50,7 @@ void BearUI::Classic::BearUIListBox::Reset()
 	PopItems();
 
 
-	bool view_all = Items.size()*BearUIListItem::GetHieght(Font) > Rect.y1;
+	bool view_all = m_items.size()*BearUIListItem::GetHieght(Font) > Rect.y1;
 
 	BearCore::BearVector2<float> size = Size;
 	if (view_all)
@@ -41,24 +60,24 @@ void BearUI::Classic::BearUIListBox::Reset()
 		UIScrollBar.Rect.x1 = static_cast<float>(Font.GetHieght());
 		UIScrollBar.Rect.x +=size.x;
 		UIScrollBar.Visible = false;
-		UIScrollBar.ScrollZoneView = Rect.y1/(Items.size()*BearUIListItem::GetHieght(Font)) ;
+		UIScrollBar.ScrollZoneView = Rect.y1/(m_items.size()*BearUIListItem::GetHieght(Font)) ;
 	}
 	else
 	{
 		UIScrollBar.Visible = true;
 	}
 
-	if (Items.size() > UIItems.size())
+	if (m_items.size() > UIItems.size())
 	{
-		for (bsize i = UIItems.size(); i < Items.size(); i++)
+		for (bsize i = UIItems.size(); i < m_items.size(); i++)
 		{
 			UIItems.push_back(BearCore::bear_new<BearUIListItem>());
 			
 		}
 	}
-	else if (Items.size() < UIItems.size())
+	else if (m_items.size() < UIItems.size())
 	{
-		UIItems.resize(Items.size());
+		UIItems.resize(m_items.size());
 	}
 	{
 		
@@ -75,13 +94,13 @@ void BearUI::Classic::BearUIListBox::Reset()
 
 
 
-	for (bsize i = 0; i < Items.size(); i++)
+	for (bsize i = 0; i < m_items.size(); i++)
 	{
 		UIItems[i]->Size.set(size.x - 4, size.y - 4);
 		UIItems[i]->Position.set(Position.x+2, Position.y+2 + BearUIListItem::GetHieght(Font)*i);
 		UIItems[i]->Clip.set(Rect.x+2, Rect.y+2, size.x - 4, size.y - 4);
 		UIItems[i]->Font = Font;
-		UIItems[i]->Text = Items[i];
+		UIItems[i]->Text = m_items[i];
 		UIItems[i]->ColorSelect = ColorSelect;
 		UIItems[i]->ColorSelectFocus = ColorSelectFocus;
 		UIItems[i]->Parent = this;
@@ -99,11 +118,20 @@ void BearUI::Classic::BearUIListBox::Reset()
 
 
 	BearUIItem::Reset();
-	if (SelectItem<0&&bsize(SelectItem) >= Items.size())
+	if (SelectItem<0&&bsize(SelectItem) >= m_items.size())
 		SelectItem = -1;
 	else
 		UIItems[SelectItem]->OnMessage(BearUIListItem::M_Click);
 	BearUIItem::Reset();
+}
+
+void BearUI::Classic::BearUIListBox::Reload()
+{
+	for (bsize i = 0; i < UIItems.size(); i++)
+	{
+		UIItems[i]->Font = Font;
+	}
+	BearUIItem::Reload();
 }
 
 

@@ -29,12 +29,15 @@ namespace BearUI
 			template<class CL, typename F>
 			inline void SetCallback(CL*cl, F f)
 			{
-				if (CallBack)CallBack->Destroy();
-				CallBack = BearCore::bear_create_class_function_ref(f);
-				CallBack_Class = reinterpret_cast<void*>(cl);
+				if (m_call_back)m_call_back->Destroy();
+				m_call_back = BearCore::bear_create_class_function_ref(f);
+				m_call_back_class = reinterpret_cast<void*>(cl);
 			}
-
+		private:
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
+			virtual void Reload();
 			virtual void Reset();
 			virtual void Update(BearCore::BearTime time);
 			BearUITreeNode*Select;
@@ -49,8 +52,8 @@ namespace BearUI
 			bool bUpdateScrollBar;
 			float ScrollBarHeight;
 			bool ViewedAll();
-			BearCore::BearClassFunctionRef*CallBack;
-			void*CallBack_Class;
+			BearCore::BearClassFunctionRef*m_call_back;
+			void*m_call_back_class;
 			BearCore::BearVector< BearCore::BearMemoryRef< BearUITreeNode>> Nodes;
 			BearUITexture UIPlane;
 			BearUITexture UIPlaneBackground;

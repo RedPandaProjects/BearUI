@@ -23,6 +23,20 @@ BearUI::Classic::BearUITextBox::~BearUITextBox()
 {
 }
 
+float BearUI::Classic::BearUITextBox::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUITextBox::CalcHeight() const
+{
+	if (!Style.test(S_richTextBox))
+	{
+		return static_cast<float>(Font.GetMaxHieght()) + 2 + 4;
+	}
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUITextBox::OnMessage(int32 message)
 {
 	switch (message)
@@ -45,7 +59,7 @@ void BearUI::Classic::BearUITextBox::Reset()
 {
 	if (Style.test(S_richTextBox))
 	{
-		 UIText.UIText.Flags.set(false,  UIText.UIText.F_IgnoreLine);
+		 UIText.UIText.Style.set(false,  UIText.UIText.ST_OneLine);
 		 Rect.x1 -= static_cast<float>(Font.GetHieght());
 		 Rect.y1 -= static_cast<float>(Font.GetHieght());
 		 ////////////////////////////////////////////////////////////////////
@@ -68,7 +82,7 @@ void BearUI::Classic::BearUITextBox::Reset()
 	else
 	{
 		Rect.y1 = static_cast<float>(Font.GetMaxHieght()) + 2 + 4;
-		UIText.UIText.Flags.set(true,  UIText.UIText.F_IgnoreLine);
+		UIText.UIText.Style.set(true, UIText.UIText.ST_OneLine);
 		UIScrollBarUD.Visible = true;
 		UIScrollBarRL.Visible = true;
 
@@ -375,6 +389,12 @@ int32 BearUI::Classic::BearUITextBox::GetCursor(float x, float y)
 	return 0;
 }
 
+void BearUI::Classic::BearUITextBox::Reload()
+{
+	UIText.UIText.Font = Font;
+	BearUIItem::Reload();
+}
+
 void BearUI::Classic::BearUITextBox::CBScrollBarUD()
 {
 	UIText.UIText_ShiftY = (static_cast<float>((Text.count_element(TEXT("\n"))+1)*Font.GetHieght()) - (UIText.UIText.Size.y))*UIScrollBarUD.ScrollPosition;
@@ -394,17 +414,17 @@ void BearUI::Classic::BearUITextBox::ScrollBarUD_Update()
 
 void BearUI::Classic::BearUITextBox::CBScrollBarRL()
 {
-	UIText.UIText_Shift = ((UIText.UIText.GetMaxSizeLine(*UIText.UIText.Text)) - (UIText.UIText.Size.x))*UIScrollBarRL.ScrollPosition;
+	UIText.UIText_Shift = ((UIText.UIText.CalcWidth()) - (UIText.UIText.Size.x))*UIScrollBarRL.ScrollPosition;
 	UIText.UpdatePosition(UIPlane);
 	UICursor.UpdatePosition(UIText, UIPlane);
 }
 
 void BearUI::Classic::BearUITextBox::ScrollBarRL_Update()
 {
-	UIScrollBarRL.SetZoneView(UIText.UIText.Size.x / UIText.UIText.GetMaxSizeLine(*UIText.UIText.Text));
+	UIScrollBarRL.SetZoneView(UIText.UIText.Size.x / UIText.UIText.CalcWidth());
 	
 	if (UIText.UIText_Shift)
-		UIScrollBarRL.SetPosition(UIText.UIText_Shift / (UIText.UIText.GetMaxSizeLine(*UIText.UIText.Text) - (UIText.UIText.Size.x)));
+		UIScrollBarRL.SetPosition(UIText.UIText_Shift / (UIText.UIText.CalcWidth() - (UIText.UIText.Size.x)));
 	else
 		UIScrollBarRL.SetPosition(0);
 
@@ -434,7 +454,7 @@ void BearUI::Classic::BearUITextBox::SCursor::Update(SText & UIText, BearUITextu
 	UIPlane.Position.x = 0;
 	UIPlane.Position.y = 0;
 
-	UIPlane.Position.x +=  UIText.UIText.GetSizeLastLine(* UIText.UIText.Text,Position);
+	UIPlane.Position.x += BearUIText::GetWidthWithSizeLimit(UIText.UIText.Font,* UIText.UIText.Text,Position,0,static_cast<BearUIText::EStyleText>(*UIText.UIText.Style),BearUIText::W_LastLine);
 	UIPlane.Position.y += static_cast<float>(UIText.GetCountLine(Position))*UIText.UIText.Font.GetHieght();
 	if (UIPlane.Position.x+ UIText.UIText.Position.x > UIGlobalPlane.Position.x +2+ UIText.UIText.Size.x-4)
 	{
@@ -464,7 +484,7 @@ void BearUI::Classic::BearUITextBox::SCursor::UpdatePosition(SText & UIText, Bea
 	UIPlane.Position.x = 0;
 	UIPlane.Position.y = 0;
 
-	UIPlane.Position.x += UIText.UIText.GetSizeLastLine(*UIText.UIText.Text, Position);
+	UIPlane.Position.x += BearUIText::GetWidthWithSizeLimit(UIText.UIText.Font, *UIText.UIText.Text, Position, 0, static_cast<BearUIText::EStyleText>(*UIText.UIText.Style), BearUIText::W_LastLine);
 	UIPlane.Position.y += static_cast<float>(UIText.GetCountLine(Position))*UIText.UIText.Font.GetHieght();
 
 	UIPlane.Position += UIText.UIText.Position;
@@ -487,7 +507,9 @@ bint BearUI::Classic::BearUITextBox::SCursor::GetPosition(SText & UIText, BearUI
 	float size_old = 0;
 	for (bsize i = 0; i < size_line ; i++)
 	{
-		float size = UIText.UIText.GetSizeLastLine(&UIText.UIText.Text[position_line], i + 1);
+		float size = BearUIText::GetWidthWithSizeLimit(UIText.UIText.Font, &UIText.UIText.Text[position_line], i + 1, 0, static_cast<BearUIText::EStyleText>(*UIText.UIText.Style), BearUIText::W_LastLine);
+
+	//	float size = UIText.UIText.GetSizeLastLine(&UIText.UIText.Text[position_line], i + 1);
 		if (size > lposition.x)
 		{
 			if (size - lposition.x  >= lposition.x- size_old)
@@ -507,14 +529,18 @@ bint BearUI::Classic::BearUITextBox::SCursor::GetPosition(SText & UIText, BearUI
 
 void BearUI::Classic::BearUITextBox::SCursor::UpdateShiftRight(SText & UIText, BearUITexture & UIGlobalPlane)
 {
-	float SizeLine = UIText.UIText.GetSizeLastLine(*UIText.UIText.Text, static_cast<bsize>(Position));
+//	float SizeLine = UIText.UIText.GetSizeLastLine(*UIText.UIText.Text, static_cast<bsize>(Position));
+	float SizeLine = BearUIText::GetWidthWithSizeLimit(UIText.UIText.Font, &UIText.UIText.Text[0], static_cast<bsize>(Position), 0, static_cast<BearUIText::EStyleText>(*UIText.UIText.Style), BearUIText::W_LastLine);
+
 	UIText.UIText_Shift = SizeLine - UIText.UIText.Size.x;
 	UIText.UpdatePosition(UIGlobalPlane);
 }
 
 void BearUI::Classic::BearUITextBox::SCursor::UpdateShiftLeft(SText & UIText, BearUITexture & UIGlobalPlane)
 {
-	float SizeLine = UIText.UIText.GetSizeLastLine(*UIText.UIText.Text, static_cast<bsize>(Position));
+//	float SizeLine = UIText.UIText.GetSizeLastLine(*UIText.UIText.Text, static_cast<bsize>(Position));
+	float SizeLine = BearUIText::GetWidthWithSizeLimit(UIText.UIText.Font, &UIText.UIText.Text[0], static_cast<bsize>(Position), 0, static_cast<BearUIText::EStyleText>(*UIText.UIText.Style), BearUIText::W_LastLine);
+
 	UIText.UIText_Shift = SizeLine;
 	UIText.UpdatePosition(UIGlobalPlane);
 }

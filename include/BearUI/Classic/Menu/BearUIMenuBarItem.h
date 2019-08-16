@@ -16,6 +16,8 @@ namespace BearUI
 			BearFontRef Font;
 			BearCore::BearString Text;
 			BearUIMenu*Menu;
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
 			enum EMesssage
 			{
@@ -30,6 +32,7 @@ namespace BearUI
 			virtual void OnMessage(int32 message);
 			virtual void Reset();
 			virtual void KillFocus();
+			virtual void Reload();
 		private:
 			BearUIText UIText;
 			BearUITexture UIPlane;

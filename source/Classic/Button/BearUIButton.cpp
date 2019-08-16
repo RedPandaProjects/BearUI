@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUI::Classic::BearUIButton::BearUIButton():CallBack(0),CallBack_Class(0), bPress(false), TriangleStyle(BearUITriangle::S_TriangleRight)
+BearUI::Classic::BearUIButton::BearUIButton():m_call_back(0), m_call_back_class(0), m_press(false), TriangleStyle(BearUITriangle::S_TriangleRight)
 {
 	UIText.Style = UIText.ST_CenterOfHeight|UIText.ST_CenterOfWidth;
 	PushItem(&UIText);
@@ -12,18 +12,28 @@ BearUI::Classic::BearUIButton::BearUIButton():CallBack(0),CallBack_Class(0), bPr
 
 BearUI::Classic::BearUIButton::~BearUIButton()
 {
-	if (CallBack)CallBack->Destroy();
-	CallBack = 0;
-	CallBack_Class = 0;
+	if (m_call_back)m_call_back->Destroy();
+	m_call_back = 0;
+	m_call_back_class = 0;
 }
 
+
+float BearUI::Classic::BearUIButton::CalcWidth() const
+{
+	return UIText.CalcWidth()+2;
+}
+
+float BearUI::Classic::BearUIButton::CalcHeight() const
+{
+	return UIText.CalcHeight() + 2;
+}
 
 void BearUI::Classic::BearUIButton::Update(BearCore::BearTime time)
 {
 	BearUIItem::Update(time);
-	if (bPress)
+	if (m_press)
 	{
-		if (CallBack)CallBack->Call<void>(CallBack_Class);
+		if (m_call_back)m_call_back->Call<void>(m_call_back_class);
 	}
 	UIText.Position = Position;
 	if (Style.test(S_WithoutBackground))
@@ -91,10 +101,10 @@ void BearUI::Classic::BearUIButton::OnMessage(int32 message)
 			switch (message)
 			{
 			case M_MouseLClick:
-				bPress = true;
+				m_press = true;
 				break;
 			case M_MouseLUp:
-				bPress = false;
+				m_press = false;
 				break;
 			default:
 				break;
@@ -105,7 +115,7 @@ void BearUI::Classic::BearUIButton::OnMessage(int32 message)
 			switch (message)
 			{
 			case M_MouseLClick:
-				if (CallBack)CallBack->Call<void>(CallBack_Class);
+				if (m_call_back)m_call_back->Call<void>(m_call_back_class);
 				break;
 			default:
 				break;
@@ -119,27 +129,25 @@ void BearUI::Classic::BearUIButton::OnMessage(int32 message)
 
 bool BearUI::Classic::BearUIButton::OnMouse(float x, float y)
 {
-	if (bPress)return true;
+	if (m_press)return true;
 	return BearUIItem::OnMouse(x,y);
 }
 
 bool BearUI::Classic::BearUIButton::OnKeyDown(BearInput::Key key)
 {
-	if (bPress)return true;
+	if (m_press)return true;
 	return BearUIItem::OnKeyDown(key);
 }
 
 bool BearUI::Classic::BearUIButton::OnKeyUp(BearInput::Key key)
 {
-	if (key == BearInput::KeyMouseLeft)bPress = false;
+	if (key == BearInput::KeyMouseLeft)m_press = false;
 	return BearUIItem::OnKeyUp(key);
 }
 
 void BearUI::Classic::BearUIButton::Reset()
 {
 	UIText.Rect = Rect;
-	UIText.Text = Text;
-	UIText.Font = Font;
 	UITexture.Rect = Rect;
 	UITextureBack.Rect = Rect;
 
@@ -189,7 +197,14 @@ void BearUI::Classic::BearUIButton::Reset()
 
 void BearUI::Classic::BearUIButton::KillFocus()
 {
-	bPress = false;
+	m_press = false;
 	BearUIItem::KillFocus();
+}
+
+void BearUI::Classic::BearUIButton::Reload()
+{
+	UIText.Text = Text;
+	UIText.Font = Font;
+	BearUIItem::Reload();
 }
 

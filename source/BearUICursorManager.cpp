@@ -6,7 +6,7 @@ BearUI::BearUICursorBase::~BearUICursorBase()
 
 BearUI::BearUICursorManager::BearUICursorManager()
 {
-	CurentViewport = 0;
+	m_curent_viewport = 0;
 }
 
 BearUI::BearUICursorManager::~BearUICursorManager()
@@ -15,26 +15,26 @@ BearUI::BearUICursorManager::~BearUICursorManager()
 
 void BearUI::BearUICursorManager::AddCursor(int32 type, BearCore::BearMemoryRef<BearUICursorBase>&& Cursor)
 {
-	BEAR_ASSERT(MapCursors.find(type) == MapCursors.end());
+	BEAR_ASSERT(m_cursors.find(type) == m_cursors.end());
 	BEAR_ASSERT(type > 0);
-	MapCursors.insert(type, Cursor);
+	m_cursors.insert(type, Cursor);
 }
 
 void BearUI::BearUICursorManager::DetachViewport()
 {
-	CurentViewport = 0;
+	m_curent_viewport = 0;
 }
 
 void BearUI::BearUICursorManager::AttachViewport(BearViewport & viewport)
 {
-	CurentViewport = &viewport;
+	m_curent_viewport = &viewport;
 }
 
 BearCore::BearVector2<float> BearUI::BearUICursorManager::GetMousePosition()
 {
-	if (CurentViewport)
+	if (m_curent_viewport)
 	{
-		return CurentViewport->GetMousePosition();
+		return m_curent_viewport->GetMousePosition();
 	}
 	return BearInput::GetMousePosition();
 }
@@ -44,21 +44,21 @@ void BearUI::BearUICursorManager::Draw(BearUI * ui, int32 type_cursor, BearCore:
 	switch (type_cursor)
 	{
 	case C_None:
-		if (CurentViewport)CurentViewport->ShowCursor(false);
+		if (m_curent_viewport)m_curent_viewport->ShowCursor(false);
 		break;
 	case C_Default:
-		if (CurentViewport)CurentViewport->ShowCursor(true);
+		if (m_curent_viewport)m_curent_viewport->ShowCursor(true);
 		break;
 	default:
 	{
-		auto find = MapCursors.find(type_cursor);
-		if (find == MapCursors.end())
+		auto find = m_cursors.find(type_cursor);
+		if (find == m_cursors.end())
 		{
-			if (CurentViewport)CurentViewport->ShowCursor(true);
+			if (m_curent_viewport)m_curent_viewport->ShowCursor(true);
 		}
 		else
 		{
-			if (CurentViewport)CurentViewport->ShowCursor(false);
+			if (m_curent_viewport)m_curent_viewport->ShowCursor(false);
 			find->second->Position = GetMousePosition();
 			find->second->Draw(ui, time);
 		}
@@ -69,7 +69,7 @@ void BearUI::BearUICursorManager::Draw(BearUI * ui, int32 type_cursor, BearCore:
 
 void BearUI::BearUICursorManager::Reset()
 {
-	for (auto begin = MapCursors.begin(), end = MapCursors.end(); begin != end; begin++)
+	for (auto begin = m_cursors.begin(), end = m_cursors.end(); begin != end; begin++)
 	{
 		begin->second->Reset();
 	}
@@ -78,7 +78,7 @@ void BearUI::BearUICursorManager::Reset()
 
 void BearUI::BearUICursorManager::Unload()
 {
-	for (auto begin = MapCursors.begin(), end = MapCursors.end(); begin != end; begin++)
+	for (auto begin = m_cursors.begin(), end = m_cursors.end(); begin != end; begin++)
 	{
 		begin->second->Unload();
 	}
@@ -86,7 +86,7 @@ void BearUI::BearUICursorManager::Unload()
 
 void BearUI::BearUICursorManager::Reload()
 {
-	for (auto begin = MapCursors.begin(), end = MapCursors.end(); begin != end; begin++)
+	for (auto begin = m_cursors.begin(), end = m_cursors.end(); begin != end; begin++)
 	{
 		begin->second->Reload();
 	}

@@ -16,6 +16,16 @@ BearUI::Classic::BearUICheakBoxSwitch::~BearUICheakBoxSwitch()
 {
 }
 
+float BearUI::Classic::BearUICheakBoxSwitch::CalcWidth() const
+{
+	return 0.0f;
+}
+
+float BearUI::Classic::BearUICheakBoxSwitch::CalcHeight() const
+{
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUICheakBoxSwitch::OnMessage(int32 message)
 {
 	switch (message)

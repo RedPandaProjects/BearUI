@@ -76,8 +76,8 @@ namespace BearUI
 			template<class CL, typename F>
 			inline void SetCallback(CL*cl, F f)
 			{
-				CallBack = BearCore::bear_create_class_function_ref(f);
-				CallBack_Class = reinterpret_cast<void*>(cl);
+				m_call_back = BearCore::bear_create_class_function_ref(f);
+				m_call_back_class = reinterpret_cast<void*>(cl);
 			}
 			enum EFlags
 			{
@@ -86,7 +86,7 @@ namespace BearUI
 
 			inline bool IsPress()const
 			{
-				return bPress;
+				return m_press;
 			}
 			enum EStyle
 			{
@@ -94,6 +94,8 @@ namespace BearUI
 				S_Triangle = 2
 			};
 			BearUITriangle::EStyle TriangleStyle;
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
 
 			virtual void Update(BearCore::BearTime time);
@@ -103,15 +105,15 @@ namespace BearUI
 			virtual bool OnKeyUp(BearInput::Key key);
 			virtual void Reset();
 			virtual void KillFocus();
-		
+			virtual void Reload();
 		private:
 			BearUITexture UITexture;
 			BearUITexture UITextureBack;
 			BearUIText UIText;
 			BearUITriangle UITriangle;;
-			BearCore::BearClassFunctionRef*CallBack;
-			void*CallBack_Class;
-			bool bPress;
+			BearCore::BearClassFunctionRef*m_call_back;
+			void*m_call_back_class;
+			bool m_press;
 		};
 	};
 }

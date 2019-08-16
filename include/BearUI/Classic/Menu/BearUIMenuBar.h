@@ -15,7 +15,8 @@ namespace BearUI
 			BearCore::BearColor ColorBackground;
 			BearFontRef Font;
 			BearUIMenu&Add(const bchar*Text);
-			float GetHeight();
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
 			enum EMessage
 			{
@@ -26,6 +27,7 @@ namespace BearUI
 			virtual void Update(BearCore::BearTime time);
 			virtual bool OnMouse(float x, float y);
 			virtual void KillFocus();
+			virtual void Reload();
 		private:
 			BearUITexture UIPlane;
 			BearCore::BearVector< BearCore::BearMemoryRef< BearUIMenuBarItem>> UIMenuItems;

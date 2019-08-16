@@ -18,6 +18,9 @@ namespace BearUI
 			S_TriangleLeft =3 ,
 			S_TriangleRight=7,
 		};
+	private:
+		virtual float  CalcWidth() const;
+		virtual float  CalcHeight() const;
 	public:
 		virtual void Draw(BearUI * ui, BearCore::BearTime time);
 		virtual void Reset();

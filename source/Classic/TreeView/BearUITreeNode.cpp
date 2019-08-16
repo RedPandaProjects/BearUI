@@ -40,13 +40,29 @@ BearUI::Classic::BearUITreeNode & BearUI::Classic::BearUITreeNode::Add(const bch
 	return *Node;
 }
 
+float BearUI::Classic::BearUITreeNode::CalcHeight() const
+{
+	float result = static_cast<float>(Font.GetHieght()) + 2;
+	for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
+	{
+		if (Deployed)
+			result += (*b)->CalcHeight();
+	}
+	return result;
+}
+
+float BearUI::Classic::BearUITreeNode::CalcWidth() const
+{
+	return 0.0f;
+}
+
 void BearUI::Classic::BearUITreeNode::Reset()
 {
 	if (Font.Empty())return;
 	Height = 0;
 	PopItems();
 	UIText.Clip = Clip;
-	UIText.Font = Font;
+	
 	UIText.Text = Text;
 	UIButton.Parent = this;
 	UIButton.Color = BearCore::BearColor::White;
@@ -104,7 +120,7 @@ void BearUI::Classic::BearUITreeNode::Update(BearCore::BearTime time)
 	else
 		UIButton.Visible = true;
 
-	float width_shift = UIText.GetMaxSizeLine(TEXT("   ")) + 8 + static_cast<float>(Font.GetHieght()) + WidthShift;
+	float width_shift = BearUIText::GetWidth(Font,TEXT("   ")) + 8 + static_cast<float>(Font.GetHieght()) + WidthShift;
 
 	for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
 	{
@@ -117,7 +133,7 @@ void BearUI::Classic::BearUITreeNode::Update(BearCore::BearTime time)
 		(*b)->WidthShift = width_shift;
 		(*b)->Update(BearCore::BearTime());
 		if(Deployed)
-		Height += (*b)->GetHeight();
+		Height += (*b)->CalcHeight();
 	}
 
 	BearUIItem::Update(time);
@@ -206,4 +222,14 @@ void BearUI::Classic::BearUITreeNode::NodesWrap()
 		(*b)->UIButton.bSwitch = false;
 		(*b)->NodesWrap();
 	}
+}
+
+void BearUI::Classic::BearUITreeNode::Reload()
+{
+	UIText.Font = Font;
+	for (auto b = Nodes.begin(), e = Nodes.end(); b != e; b++)
+	{
+		(*b)->Font = Font;
+	}
+	BearUIItem::Reload();
 }

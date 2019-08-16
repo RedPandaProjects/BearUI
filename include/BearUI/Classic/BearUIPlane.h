@@ -13,7 +13,11 @@ namespace BearUI
 			BearUIPlane();
 			~BearUIPlane();
 			BearCore::BearColor Color;
+		private:
+			virtual float  CalcWidth() const;
+			virtual float  CalcHeight() const;
 		protected:
+
 			virtual void Reset();
 		private:
 			BearUITexture UIPlane;
