@@ -1,36 +1,36 @@
 #include "BearUI.hpp"
 
-BearUI::BearUICursorBase::~BearUICursorBase()
+BearUICursorBase::~BearUICursorBase()
 {
 }
 
-BearUI::BearUICursorManager::BearUICursorManager()
+BearUICursorManager::BearUICursorManager()
 {
 	m_curent_viewport = 0;
 }
 
-BearUI::BearUICursorManager::~BearUICursorManager()
+BearUICursorManager::~BearUICursorManager()
 {
 }
 
-void BearUI::BearUICursorManager::AddCursor(int32 type, BearCore::BearMemoryRef<BearUICursorBase>&& Cursor)
+void BearUICursorManager::AddCursor(int32 type,BearRef<BearUICursorBase>&& Cursor)
 {
 	BEAR_ASSERT(m_cursors.find(type) == m_cursors.end());
 	BEAR_ASSERT(type > 0);
 	m_cursors.insert(type, Cursor);
 }
 
-void BearUI::BearUICursorManager::DetachViewport()
+void BearUICursorManager::DetachViewport()
 {
 	m_curent_viewport = 0;
 }
 
-void BearUI::BearUICursorManager::AttachViewport(BearViewport & viewport)
+void BearUICursorManager::AttachViewport(BearWindow & viewport)
 {
 	m_curent_viewport = &viewport;
 }
 
-BearCore::BearVector2<float> BearUI::BearUICursorManager::GetMousePosition()
+BearVector2<float> BearUICursorManager::GetMousePosition()
 {
 	if (m_curent_viewport)
 	{
@@ -39,7 +39,7 @@ BearCore::BearVector2<float> BearUI::BearUICursorManager::GetMousePosition()
 	return BearInput::GetMousePosition();
 }
 
-void BearUI::BearUICursorManager::Draw(BearUI * ui, int32 type_cursor, BearCore::BearTime time)
+void BearUICursorManager::Draw(BearUI * ui, int32 type_cursor,BearTime time)
 {
 	switch (type_cursor)
 	{
@@ -67,7 +67,7 @@ void BearUI::BearUICursorManager::Draw(BearUI * ui, int32 type_cursor, BearCore:
 	}
 }
 
-void BearUI::BearUICursorManager::Reset()
+void BearUICursorManager::Reset()
 {
 	for (auto begin = m_cursors.begin(), end = m_cursors.end(); begin != end; begin++)
 	{
@@ -76,7 +76,7 @@ void BearUI::BearUICursorManager::Reset()
 
 }
 
-void BearUI::BearUICursorManager::Unload()
+void BearUICursorManager::Unload()
 {
 	for (auto begin = m_cursors.begin(), end = m_cursors.end(); begin != end; begin++)
 	{
@@ -84,11 +84,11 @@ void BearUI::BearUICursorManager::Unload()
 	}
 }
 
-void BearUI::BearUICursorManager::Reload()
+void BearUICursorManager::Reload(BearUIResourcesManager* Manager)
 {
 	for (auto begin = m_cursors.begin(), end = m_cursors.end(); begin != end; begin++)
 	{
-		begin->second->Reload();
+		begin->second->Reload(Manager);
 	}
 }
 

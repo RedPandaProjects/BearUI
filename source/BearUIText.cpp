@@ -1,27 +1,27 @@
 #include "BearUI.hpp"
 
 
-BearUI::BearUIText::BearUIText():Color(BearCore::BearColor::White), Select(0),SelectStart(0),SelectEnd(0)
+BearUIText::BearUIText():Color(BearColor::White), Select(0),SelectStart(0),SelectEnd(0)
 {
 }
 
-BearUI::BearUIText::~BearUIText()
+BearUIText::~BearUIText()
 {
 }
 
 
-void BearUI::BearUIText::Draw(BearUI * ui, BearCore::BearTime time)
+void BearUIText::Draw(BearUI * ui,BearTime time)
 {
-	if (Font.Empty())return;
+	if (!Font)return;
 	if(Select)
 	ui->RenderSelectZone(this);
 	ui->Render(this);
 }
 
-void BearUI::BearUIText::Reset()
+void BearUIText::Reset()
 {
 
-	if (Font.Empty())return;
+	if (Font==nullptr)return;
 	ShiftPosition.set(0, 0);
 /*	if (Style.test(ST_CenterOfHeight))
 	{
@@ -39,40 +39,41 @@ void BearUI::BearUIText::Reset()
 	UISelectTexture.Reset();
 }
 
-float BearUI::BearUIText::CalcWidth() const
+float BearUIText::CalcWidth() const
 {
 	return GetWidth(Font, *Text, Rect.x1, static_cast<EStyleText>(*Style));
 }
 
-float BearUI::BearUIText::CalcHeight() const
+float BearUIText::CalcHeight() const
 {
+	if (Font == nullptr)return 0;
 	bsize count_ln = GetCountLine(Font, *Text, Rect.x1, static_cast<EStyleText>(*Style));
-	float result = static_cast<float>((count_ln - 1)*Font.GetHieght());
-	result += static_cast<float>(Font.GetMaxHieght());
+	float result = static_cast<float>((count_ln - 1)*Font->GetHieght());
+	result += static_cast<float>(Font->GetMaxHieght());
 	return result;
 }
 
-void BearUI::BearUIText::Unload()
+void BearUIText::Unload()
 {
-	Font.UnloadTexture();
+	Font = 0;
 	UISelectTexture.Unload();
 }
 
-void BearUI::BearUIText::Reload()
+void BearUIText::Reload(BearUIResourcesManager* manager)
 {
-	Font.ReloadTexture();
-	UISelectTexture.Reload();
+	
+	UISelectTexture.Reload(manager);
 }
 
-bsize BearUI::BearUIText::GetCountLine(const BearFontRef & font_ref, const bchar * text, float max_wigth , EStyleText eStyleText )
+bsize BearUIText::GetCountLine(const BearFont* font_ref, const bchar * text, float max_wigth , EStyleText eStyleText )
 {
-	if (font_ref.Empty())return 0;
-	auto&font = *font_ref.GetListChars();
-	bsize size = BearCore::BearString::GetSize(text);
-	BearCore::BearVector2<float> pos;
+	if (!font_ref)return 0;
+	auto&font = font_ref->GetListChars();
+	bsize size =BearString::GetSize(text);
+	BearVector2<float> pos;
 	for (bsize i = 0; i < size; i++)
 	{
-		bchar16 ch_ = BearCore::BearEncoding::ToUTF16(text[i]);
+		bchar16 ch_ =BearEncoding::ToUTF16(text[i]);
 		if (ch_ == TEXT(' '))
 		{
 			auto item = font.find(ch_);
@@ -109,22 +110,22 @@ bsize BearUI::BearUIText::GetCountLine(const BearFontRef & font_ref, const bchar
 	return static_cast<bsize>(pos.y) + 1;
 }
 
-float BearUI::BearUIText::GetWidth(const BearFontRef & font, const bchar * text, float max_wigth, EStyleText eStyleText, EWigth eWigth)
+float BearUIText::GetWidth(const BearFont* font, const bchar * text, float max_wigth, EStyleText eStyleText, EWigth eWigth)
 {
 
-	return GetWidthWithSizeLimit(font, text, BearCore::BearString::GetSize(text), max_wigth, eStyleText, eWigth);
+	return GetWidthWithSizeLimit(font, text,BearString::GetSize(text), max_wigth, eStyleText, eWigth);
 }
 
-float BearUI::BearUIText::GetWidthWithSizeLimit(const BearFontRef & font_ref, const bchar * text, bsize size, float max_wigth, EStyleText eStyleText, EWigth eWigth)
+float BearUIText::GetWidthWithSizeLimit(const BearFont* font_ref, const bchar * text, bsize size, float max_wigth, EStyleText eStyleText, EWigth eWigth)
 {
-	if (font_ref.Empty())return 0;
-	auto&font = *font_ref.GetListChars();
-	size = BearCore::bear_min(BearCore::BearString::GetSize(text), size);
-	BearCore::BearVector2<float> pos;
+	if (font_ref ==0)return 0;
+	auto&font = font_ref->GetListChars();
+	size =BearMath::min(BearString::GetSize(text), size);
+	BearVector2<float> pos;
 	float max_x = 0;
 	for (bsize i = 0; i < size; i++)
 	{
-		bchar16 ch_ = BearCore::BearEncoding::ToUTF16(text[i]);
+		bchar16 ch_ =BearEncoding::ToUTF16(text[i]);
 		if (ch_ == TEXT(' '))
 		{
 			auto item = font.find(ch_);
@@ -138,9 +139,9 @@ float BearUI::BearUIText::GetWidthWithSizeLimit(const BearFontRef & font_ref, co
 		}
 		else if (ch_ == TEXT('\n') && (!(eStyleText&ST_OneLine)))
 		{
-			pos.y += font_ref.GetHieght();
+			pos.y += font_ref->GetHieght();
 			if (eWigth != EWigth::W_LastLine)
-				max_x = BearCore::bear_max(pos.x, max_x);
+				max_x =BearMath::max(pos.x, max_x);
 			pos.x = 0;
 		}
 		else if (ch_ != TEXT('\r'))
@@ -151,7 +152,7 @@ float BearUI::BearUIText::GetWidthWithSizeLimit(const BearFontRef & font_ref, co
 			{
 				pos.y += 1;
 				if (eWigth != EWigth::W_LastLine)
-					max_x = BearCore::bear_max(pos.x, max_x);
+					max_x =BearMath::max(pos.x, max_x);
 				pos.x = 0;
 			}
 			else
@@ -161,24 +162,24 @@ float BearUI::BearUIText::GetWidthWithSizeLimit(const BearFontRef & font_ref, co
 		}
 	}
 	if (eWigth == EWigth::W_Max)
-		return  BearCore::bear_max(pos.x, max_x);
+		return BearMath::max(pos.x, max_x);
 	else if (eWigth == EWigth::W_LastLine)
 		return  pos.x;
-	return  BearCore::bear_max(pos.x, max_x);
+	return BearMath::max(pos.x, max_x);
 }
 
 
 
-BearCore::BearVector2<float> BearUI::BearUIText::GetMaxHeightCharInLine(const BearFontRef & font_ref, const bchar * text, EStyleText eStyleText )
+BearVector2<float> BearUIText::GetMaxHeightCharInLine(const BearFont* font_ref, const bchar * text, EStyleText eStyleText )
 {
-	if (font_ref.Empty())return 	BearCore::BearVector2<float>();
-	auto&font = *font_ref.GetListChars();
-	bsize size = BearCore::BearString::GetSize(text);
-	BearCore::BearVector2<float> pos;
-	BearCore::BearVector2<float> max_y;
+	if (!font_ref)return 	BearVector2<float>();
+	auto&font = font_ref->GetListChars();
+	bsize size =BearString::GetSize(text);
+	BearVector2<float> pos;
+	BearVector2<float> max_y;
 	for (bsize i = 0; i < size; i++)
 	{
-		bchar16 ch_ = BearCore::BearEncoding::ToUTF16(text[i]);
+		bchar16 ch_ =BearEncoding::ToUTF16(text[i]);
 		if (ch_ == TEXT(' '))
 		{
 			auto item = font.find(ch_);

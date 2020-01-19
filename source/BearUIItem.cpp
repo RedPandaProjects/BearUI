@@ -1,15 +1,15 @@
 #include "BearUI.hpp"
 
-BearUI::BearUIItem::BearUIItem():m_mouse_enter(false), m_focus(0), m_focus_item(0), Enable(true), UI(0)
+BearUIItem::BearUIItem():m_mouse_enter(false), m_focus(0), m_focus_item(0), Enable(true), UI(0)
 {
 }
 
-BearUI::BearUIItem::~BearUIItem()
+BearUIItem::~BearUIItem()
 {
 }
 
 
-void BearUI::BearUIItem::PushItem(BearUIItem * item)
+void BearUIItem::PushItem(BearUIItem * item)
 {
 	item->Reset();
 	item->UI = UI;
@@ -17,13 +17,13 @@ void BearUI::BearUIItem::PushItem(BearUIItem * item)
 	m_static_items.push_back(item);
 }
 
-void BearUI::BearUIItem::PushItem(BearUIStaticItem * item)
+void BearUIItem::PushItem(BearUIStaticItem * item)
 {
 	item->Reset();
 	m_static_items.push_back(item);
 }
 
-void BearUI::BearUIItem::PushItemInBegin(BearUIItem * item)
+void BearUIItem::PushItemInBegin(BearUIItem * item)
 {
 	item->Reset();
 	item->UI = UI;
@@ -31,13 +31,13 @@ void BearUI::BearUIItem::PushItemInBegin(BearUIItem * item)
 	m_static_items.insert(m_static_items.begin(), item);
 }
 
-void BearUI::BearUIItem::PushItemInBegin(BearUIStaticItem * item)
+void BearUIItem::PushItemInBegin(BearUIStaticItem * item)
 {
 	item->Reset();
 	m_static_items.insert(m_static_items.begin(), item);
 }
 
-void BearUI::BearUIItem::PopItem(BearUIItem * item)
+void BearUIItem::PopItem(BearUIItem * item)
 {
 	item->UI = 0;
 	{
@@ -59,7 +59,7 @@ void BearUI::BearUIItem::PopItem(BearUIItem * item)
 	}
 }
 
-void BearUI::BearUIItem::PopItem(BearUIStaticItem * item)
+void BearUIItem::PopItem(BearUIStaticItem * item)
 {
 	{
 		auto b = m_static_items.begin();
@@ -76,7 +76,7 @@ void BearUI::BearUIItem::PopItem(BearUIStaticItem * item)
 	}
 }
 
-void BearUI::BearUIItem::PopItems()
+void BearUIItem::PopItems()
 {
 	{
 		auto b = m_items.begin();
@@ -91,7 +91,7 @@ void BearUI::BearUIItem::PopItems()
 	m_items.clear_not_free();
 }
 
-void BearUI::BearUIItem::Update(BearCore::BearTime time)
+void BearUIItem::Update(BearTime time)
 {
 	if (Visible)return;
 	{
@@ -105,7 +105,7 @@ void BearUI::BearUIItem::Update(BearCore::BearTime time)
 	}
 }
 
-void BearUI::BearUIItem::Draw(BearUI * ui, BearCore::BearTime time)
+void BearUIItem::Draw(BearUI * ui,BearTime time)
 {
 	if (Visible)return;
 	{
@@ -129,7 +129,7 @@ void BearUI::BearUIItem::Draw(BearUI * ui, BearCore::BearTime time)
 }
 
 
-void BearUI::BearUIItem::OnMessage(int32 message)
+void BearUIItem::OnMessage(int32 message)
 {
 	switch (message)
 	{
@@ -154,7 +154,7 @@ void BearUI::BearUIItem::OnMessage(int32 message)
 
 }
 
-bool BearUI::BearUIItem::OnMouse(float x, float y)
+bool BearUIItem::OnMouse(float x, float y)
 {
 	if (Visible)return false;
 	m_mouse_last_position.set(x, y);
@@ -213,7 +213,7 @@ bool BearUI::BearUIItem::OnMouse(float x, float y)
 	return false;
 }
 
-bool BearUI::BearUIItem::OnKeyDown(BearInput::Key key)
+bool BearUIItem::OnKeyDown(BearInput::Key key)
 {
 	if (Visible)return false;
 	if (m_focus_item)
@@ -254,7 +254,7 @@ bool BearUI::BearUIItem::OnKeyDown(BearInput::Key key)
 	return false;
 }
 
-bool BearUI::BearUIItem::OnKeyUp(BearInput::Key key)
+bool BearUIItem::OnKeyUp(BearInput::Key key)
 {
 	if (Visible)return false;
 	if (m_focus_item &&m_focus_item->OnKeyUp(key))return true;
@@ -282,7 +282,7 @@ bool BearUI::BearUIItem::OnKeyUp(BearInput::Key key)
 	return false;
 }
 
-void BearUI::BearUIItem::Reset()
+void BearUIItem::Reset()
 {
 	KillFocus();
 	{
@@ -308,7 +308,7 @@ void BearUI::BearUIItem::Reset()
 	m_mouse_enter = false;
 }
 
-void BearUI::BearUIItem::KillFocus()
+void BearUIItem::KillFocus()
 {
 	m_focus = false;
 	m_focus_item = 0;
@@ -322,7 +322,7 @@ void BearUI::BearUIItem::KillFocus()
 	m_mouse_enter = false;
 }
 
-void BearUI::BearUIItem::Unload()
+void BearUIItem::Unload()
 {
 	{
 		auto b = m_static_items.begin();
@@ -345,15 +345,15 @@ void BearUI::BearUIItem::Unload()
 	
 }
 
-void BearUI::BearUIItem::Reload()
+void BearUIItem::Reload(BearUIResourcesManager* Manager)
 {
-	BearUIStaticItem::Reload();
+	BearUIStaticItem::Reload(Manager);
 	{
 		auto b = m_static_items.begin();
 		auto e = m_static_items.end();
 		while (b != e)
 		{
-			(*b)->Reload();
+			(*b)->Reload(Manager);
 			b++;
 		}
 	}
@@ -368,7 +368,7 @@ void BearUI::BearUIItem::Reload()
 	}*/
 }
 
-bool BearUI::BearUIItem::OnChar(bchar16 ch)
+bool BearUIItem::OnChar(bchar16 ch)
 {
 	if (Visible)return false;
 	if (m_focus_item)
@@ -390,7 +390,7 @@ bool BearUI::BearUIItem::OnChar(bchar16 ch)
 	return false;
 }
 
-int32 BearUI::BearUIItem::GetCursor(float x,float y)
+int32 BearUIItem::GetCursor(float x,float y)
 {
 	if (Visible)return false;
 	if (m_focus_item)
@@ -411,7 +411,7 @@ int32 BearUI::BearUIItem::GetCursor(float x,float y)
 }
 
 
-void BearUI::BearUIItem::UpdateFocus()
+void BearUIItem::UpdateFocus()
 {
 	auto b = m_items.begin();
 	auto e = m_items.end();

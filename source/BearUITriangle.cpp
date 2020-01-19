@@ -1,37 +1,37 @@
 #include "BearUI.hpp"
 
-BearUI::BearUITriangle::BearUITriangle():Scale(1),Color(BearCore::BearColor::White)
+BearUITriangle::BearUITriangle():Scale(1),Color(BearColor::White)
 {
 }
 
-BearUI::BearUITriangle::~BearUITriangle()
+BearUITriangle::~BearUITriangle()
 {
 }
 
-float BearUI::BearUITriangle::CalcWidth() const
-{
-	return 0.0f;
-}
-
-float BearUI::BearUITriangle::CalcHeight() const
+float BearUITriangle::CalcWidth() const
 {
 	return 0.0f;
 }
 
-void BearUI::BearUITriangle::Draw(BearUI * ui, BearCore::BearTime time)
+float BearUITriangle::CalcHeight() const
+{
+	return 0.0f;
+}
+
+void BearUITriangle::Draw(BearUI * ui,BearTime time)
 {
 	if (Visible)return;
 	ui->Render(this);
 }
 
-void BearUI::BearUITriangle::Reset()
+void BearUITriangle::Reset()
 {
 }
 
-void BearUI::BearUITriangle::Unload()
+void BearUITriangle::Unload()
 {
 }
 
-void BearUI::BearUITriangle::Reload()
+void BearUITriangle::Reload(BearUIResourcesManager* Manager)
 {
 }

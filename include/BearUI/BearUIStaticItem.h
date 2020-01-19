@@ -1,38 +1,35 @@
 #pragma once
-namespace BearUI
+class BearUI;
+class BEARUI_API BearUIStaticItem
 {
-	class BEARUI_API BearUI;
-	class BEARUI_API BearUIStaticItem
+	BEAR_CLASS_WITHOUT_COPY(BearUIStaticItem);
+protected:
+	BearUIStaticItem();
+	~BearUIStaticItem();
+public:
+	union
 	{
-		BEAR_CLASS_NO_COPY(BearUIStaticItem);
-	protected:
-		BearUIStaticItem();
-		~BearUIStaticItem();
-	public:
-		union
+		BearVector4<float> Rect;
+		struct
 		{
-			BearCore::BearVector4<float> Rect;
-			struct
-			{
-				BearCore::BearVector2<float> Position;
-				BearCore::BearVector2<float> Size;
-			};
+			BearVector2<float> Position;
+			BearVector2<float> Size;
 		};
-		BearCore::BearVector4<float> Clip;
-		enum EFlags
-		{
-			UI_NoClip = 1 << 31,
-			UI_NoMouseEnter=1<<30,
-		};
-		BearCore::BearFlags<int64> Flags;
-		BearCore::BearFlags<int64> Style;
-		bool Visible;
-	public:
-		virtual float  CalcWidth() const;
-		virtual float  CalcHeight() const;
-		virtual void Draw(BearUI * ui , BearCore::BearTime time);
-		virtual void Reset();
-		virtual void Unload() ;
-		virtual void Reload() ;
 	};
-}
+	BearVector4<float> Clip;
+	enum EFlags
+	{
+		UI_NoClip = 1 << 31,
+		UI_NoMouseEnter = 1 << 30,
+	};
+	BearFlags<int64> Flags;
+	BearFlags<int64> Style;
+	bool Visible;
+public:
+	virtual float  CalcWidth() const;
+	virtual float  CalcHeight() const;
+	virtual void Draw(BearUI* ui, BearTime time);
+	virtual void Reset();
+	virtual void Unload();
+	virtual void Reload(BearUIResourcesManager* Manager);
+};

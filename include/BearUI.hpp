@@ -6,16 +6,21 @@
 #else
 #define BEARUI_API  BEARPROJECT_IMPORT
 #endif
-#include "BearIO/BearInput.h"
-#include "BearRender/BearViewport.h"
-#include "BearResource/BearFontRef.h"
+
+#include "BearResource/BearFont.h"
+#include "BearResource/BearUIResourcesManager.h"
+#include "BearResource/BearUIVertexManager.h"
+
+
 #include "BearUI/BearUIStaticItem.h"
 #include "BearUI/BearUIItem.h"
 #include "BearUI/BearUITexture.h"
-#include "BearUI/BearUIRenderTarget.h"
 #include "BearUI/BearUIText.h"
 #include "BearUI/BearUITriangle.h"
+#include "BearUI/BearUICursorManager.h"
+#include "BearUI/BearUI.h"
 
+/*
 #include "BearUI/Classic/BearUIPlane.h"
 #include "BearUI/Classic/Button/BearUIButton.h"
 #include "BearUI/Classic/ListBox/BearUIListItem.h"
@@ -42,4 +47,4 @@
 #include "BearUI/BearUICursorManager.h"
 #include "BearUI/Classic/Cursor/BearUICursorText.h"
 
-#include "BearUI/BearUI.h"
+#include "BearUI/BearUI.h"*/
