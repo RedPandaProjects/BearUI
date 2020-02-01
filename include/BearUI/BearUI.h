@@ -30,10 +30,13 @@ public:
 	{
 		m_ResourcesManager = BearRef<BearUIResourcesManager>(bear_new<C>());
 	}
-
+	void AttactViewportAsFrameBuffer(BearFactoryPointer<BearRHI::BearRHIViewport> FrameBuffer);
 private:
 	void UpdateFocus();
-
+	struct 
+	{
+		BearFactoryPointer<BearRHI::BearRHIViewport> ViewportAsFrameBuffer;
+	} FrameBuffer;
 
 	BearFactoryPointer<BearRHI::BearRHIUniformBuffer> m_ConstantsScreen;
 	BearFactoryPointer<BearRHI::BearRHIUniformBuffer> m_ConstantsColor;

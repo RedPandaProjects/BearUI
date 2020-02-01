@@ -54,7 +54,7 @@ void BearUI::Draw(BearFactoryPointer<BearRHI::BearRHIContext>& Context, BearTime
 	m_CurrentContext = Context.get();
 	if (m_CurrentContext == nullptr)return;
 	if (m_RootSignatureDefault.get() == nullptr)return;
-	m_CurrentContext->SetViewport(0, 0, m_Screen.x, m_Screen.y);
+	//m_CurrentContext->SetViewport(0, 0, m_Screen.x, m_Screen.y);
 	m_VertexBuffersDefaultCurrent = m_VertexBuffersDefault.begin();
 	/*BearRenderInterface::SetViewport(0, 0, m_screen.x, m_screen.y);
 	BearRenderInterface::SetVertexState(BearDefaultManager::GetVertexState(DVS_UI));
@@ -178,8 +178,11 @@ void BearUI::Reload()
 			RootSignatureDescription.Samplers[0].Shader = ST_Pixel;
 			m_RootSignatureDefault = BearRenderInterface::CreateRootSignature(RootSignatureDescription);
 		}
-		{
-			m_SamplerDefault = BearRenderInterface::CreateSampler();
+		{	
+			BearSamplerDescription SamplerDescription;
+			SamplerDescription.Filter = SF_ANISOTROPIC;
+			SamplerDescription.MaxAnisotropy = 16;
+			m_SamplerDefault = BearRenderInterface::CreateSampler(SamplerDescription);
 		}
 		{
 			BearRootSignatureDescription RootSignatureDescription;
@@ -403,15 +406,15 @@ void BearUI::SetDescriptorHeap(BearFactoryPointer<BearRHI::BearRHITexture2D> Tex
 		if (Flags.test(DHF_Texture))
 		{
 			DescriptorHeapDescription.RootSignature = m_RootSignatureDefault;
-			DescriptorHeapDescription.SRVResurces[0] =Texture;
-			DescriptorHeapDescription.Samplers[0] = m_SamplerDefault;
+		//	DescriptorHeapDescription.SRVResurces[0] =Texture;
+//			DescriptorHeapDescription.Samplers[0] = m_SamplerDefault;
 		}
 		else
 		{
 			DescriptorHeapDescription.RootSignature = m_RootSignatureColor;
 		}
-		DescriptorHeapDescription.UniformBuffers[0] = m_ConstantsScreen;
-		DescriptorHeapDescription.UniformBuffers[1] = m_ConstantsColor;
+		//DescriptorHeapDescription.UniformBuffers[0] = m_ConstantsScreen;
+	//	DescriptorHeapDescription.UniformBuffers[1] = m_ConstantsColor;
 		m_DescriptorHeapsMap.insert(Key,BearRenderInterface::CreateDescriptorHeap( DescriptorHeapDescription));
 		item = m_DescriptorHeapsMap.find(Key);
 	}
@@ -769,6 +772,11 @@ void BearUI::Render(BearUITriangle * triangle)
 	BearRenderInterface::SetIndexBuffer(m_index_buffer);
 	BearRenderInterface::DrawIndexed(3);
 	BearRenderInterface::DisableScissor();*/
+}
+
+void BearUI::AttactViewportAsFrameBuffer(BearFactoryPointer<BearRHI::BearRHIViewport> frameBuffer)
+{
+	FrameBuffer.ViewportAsFrameBuffer = frameBuffer;
 }
 
 void BearUI::UpdateFocus()

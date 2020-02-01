@@ -114,7 +114,7 @@ BearFactoryPointer<BearRHI::BearRHITexture2D> BearFont::CreateTexture() const
 {
 	if (m_image.Empty())
 		return BearFactoryPointer<BearRHI::BearRHITexture2D>();
-	return BearRenderInterface::CreateTexture2D(m_image.GetSize().x, m_image.GetSize().y, m_image.GetMips(), m_image.GetDepth(), m_image.GetFormat(), *m_image);
+	return BearRenderInterface::CreateTexture2D(m_image.GetSize().x, m_image.GetSize().y, m_image.GetMips(), m_image.GetDepth(), m_image.GetFormat(),TU_STATIC, *m_image);
 }
 
 
