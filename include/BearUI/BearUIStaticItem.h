@@ -7,7 +7,7 @@ protected:
 	BearUIStaticItem();
 	~BearUIStaticItem();
 public:
-	union
+	union 
 	{
 		BearVector4<float> Rect;
 		struct

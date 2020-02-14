@@ -1,6 +1,6 @@
 #include "BearUI.hpp"
 
-BearUITexture::BearUITexture():Color(BearColor::White), TextureUV(0,0,1,1)
+BearUITexture::BearUITexture():Color(BearColor::White), TextureUV(0,0,1,1), Alpha(false)
 {
 	
 }
@@ -30,11 +30,17 @@ void BearUITexture::Draw(BearUI * ui,BearTime time)
 	m_vertex[1].uv.set(TextureUV.x1 + TextureUV.x, TextureUV.y + TextureUV.y);
 	m_vertex[2].uv.set(TextureUV.x, TextureUV.y);
 	m_vertex[3].uv.set(TextureUV.x1 + TextureUV.x, TextureUV.y1 + TextureUV.y);
+
+	bear_copy(m_vertex[0].color.Array, Color.R32G32B32A32, 4);
+	bear_copy(m_vertex[1].color.Array, Color.R32G32B32A32, 4);
+	bear_copy(m_vertex[2].color.Array, Color.R32G32B32A32, 4);
+	bear_copy(m_vertex[3].color.Array, Color.R32G32B32A32, 4);
 	ui->Render(this);
 }
 
 void BearUITexture::Reset()
 {
+	
 }
 
 void BearUITexture::Unload()
@@ -44,6 +50,9 @@ void BearUITexture::Unload()
 
 void BearUITexture::Reload(BearUIResourcesManager* Manager)
 {
-//	Texture= BearDefaultManager::GetTexture2D();
+	if (Texture.empty())
+	{
+		Texture = Manager->GetTexture(TEXT(""));
+	}
 }
 

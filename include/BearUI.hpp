@@ -20,6 +20,8 @@
 #include "BearUI/BearUICursorManager.h"
 #include "BearUI/BearUI.h"
 
+#include "BearUI/Classic/Button/BearUIButton.h"
+
 /*
 #include "BearUI/Classic/BearUIPlane.h"
 #include "BearUI/Classic/Button/BearUIButton.h"

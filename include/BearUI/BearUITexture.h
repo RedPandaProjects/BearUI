@@ -15,7 +15,7 @@ public:
 	BearFactoryPointer<BearRHI::BearRHITexture2D> Texture;
 	BearColor Color;
 	float Rotation;
-
+	bool Alpha;
 	virtual void Draw(BearUI* ui, BearTime time);
 	virtual void Reset();
 	virtual void Unload();

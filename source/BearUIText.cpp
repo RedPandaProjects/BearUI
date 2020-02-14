@@ -3,6 +3,7 @@
 
 BearUIText::BearUIText():Color(BearColor::White), Select(0),SelectStart(0),SelectEnd(0)
 {
+	Font = 0;
 }
 
 BearUIText::~BearUIText()
@@ -13,8 +14,8 @@ BearUIText::~BearUIText()
 void BearUIText::Draw(BearUI * ui,BearTime time)
 {
 	if (!Font)return;
-	if(Select)
-	ui->RenderSelectZone(this);
+	//if(Select)
+	//ui->RenderSelectZone(this);
 	ui->Render(this);
 }
 
@@ -61,7 +62,7 @@ void BearUIText::Unload()
 
 void BearUIText::Reload(BearUIResourcesManager* manager)
 {
-	
+	if (Font == nullptr)Font = manager->GetFont(TEXT(""));
 	UISelectTexture.Reload(manager);
 }
 

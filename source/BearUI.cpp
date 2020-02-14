@@ -7,14 +7,39 @@ BearMap<int32, int32>* GWindowsKeys;
 BearUI::BearUI(bsize width, bsize height):m_FocusItem(0), m_CurrentContext(0)
 {
 	m_Screen.set(static_cast<float>(width), static_cast<float>(height), 1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
+	m_RTF = RTF_R8G8B8A8;
 }
 BearUI::~BearUI()
 {
+	Unload();
 	BEAR_ASSERT(m_CurrentContext == nullptr);
 #ifdef WINDOWS
 	bear_free(GWindowsKeys);
 #endif
 	m_VertexBuffersDefaultCurrent = m_VertexBuffersDefault.end();
+}
+
+void BearUI::PopItem(BearUIItem* i)
+{
+	{
+		auto item = bear_find_if(m_Items.begin(), m_Items.end(), [&](BearUIItem* left) {return left == i; });
+		BEAR_ASSERT(item != m_Items.end());
+		{
+			m_Items.erase(item);
+		}
+	}
+	PopItem((BearUIStaticItem*)i);
+}
+
+void BearUI::PopItem(BearUIStaticItem* i)
+{
+	{
+		auto item = bear_find_if(m_StaticItems.begin(), m_StaticItems.end(), [&](BearUIStaticItem* left) {return left == i; });
+		BEAR_ASSERT(item != m_StaticItems.end());
+		{
+			m_StaticItems.erase(item);
+		}
+	}
 }
 
 
@@ -31,6 +56,22 @@ BearUIStaticItem * BearUI::PushItem(BearUIStaticItem * item)
 {
 	item->Reset();
 	m_StaticItems.push_back(item);
+	return item;
+}
+
+BearUIItem* BearUI::PushItemInBegin(BearUIItem* item)
+{
+	item->Reset();
+	item->UI = this;
+	m_Items.insert(m_Items.begin(),item);
+	m_StaticItems.insert(m_StaticItems.begin(), item);
+	return item;
+}
+
+BearUIStaticItem* BearUI::PushItemInBegin(BearUIStaticItem* item)
+{
+	item->Reset();
+	m_StaticItems.insert(m_StaticItems.begin(), item);
 	return item;
 }
 
@@ -126,6 +167,12 @@ void BearUI::Unload()
 {
 	{
 		{
+			m_RenderPass.clear();
+		}
+		{
+			m_Texture2DFromFonts.clear();
+		}
+		{
 			m_PipelinesMap.clear();
 			m_DescriptorHeapsMap.clear();
 		}
@@ -142,7 +189,6 @@ void BearUI::Unload()
 		}
 		{
 			m_ConstantsScreen.clear();
-			m_ConstantsColor.clear();
 		}
 		{
 
@@ -173,7 +219,6 @@ void BearUI::Reload()
 			BearRootSignatureDescription RootSignatureDescription;
 			
 			RootSignatureDescription.UniformBuffers[0].Shader = ST_Vertex;
-			RootSignatureDescription.UniformBuffers[1].Shader = ST_Pixel;
 			RootSignatureDescription.SRVResources[0].Shader = ST_Pixel;
 			RootSignatureDescription.Samplers[0].Shader = ST_Pixel;
 			m_RootSignatureDefault = BearRenderInterface::CreateRootSignature(RootSignatureDescription);
@@ -188,7 +233,6 @@ void BearUI::Reload()
 			BearRootSignatureDescription RootSignatureDescription;
 
 			RootSignatureDescription.UniformBuffers[0].Shader = ST_Vertex;
-			RootSignatureDescription.UniformBuffers[1].Shader = ST_Pixel;
 			m_RootSignatureColor = BearRenderInterface::CreateRootSignature(RootSignatureDescription);
 		}
 		{
@@ -203,10 +247,7 @@ void BearUI::Reload()
 			m_ConstantsScreen->Create(sizeof(float) * 4, true);
 
 		}
-		{
-			m_ConstantsColor = BearRenderInterface::CreateUniformBuffer();
-			m_ConstantsColor->Create(sizeof(float) * 4, true);
-		}
+
 		{
 		/*	m_VertexBufferDefault = BearRenderInterface::CreateVertexBuffer();
 			m_VertexBufferDefault->Create(sizeof(BearUIVertexManager::Default), 6, true);*/
@@ -227,11 +268,16 @@ void BearUI::Reload()
 			bear_copy(m_ConstantsScreen->Lock(), m_Screen.Array, sizeof(float) * 4);
 			m_ConstantsScreen->Unlock();
 		}
+		{
+			BearRenderPassDescription  Description;
+			Description.RenderTargets[0].Format = m_RTF;
+			m_RenderPass = BearRenderInterface::CreateRenderPass(Description);
+		}
 	}
 	{
 		//m_cursor_manager.Reload();
-		auto b = m_Items.begin();
-		auto e = m_Items.end();
+		auto b = m_StaticItems.begin();
+		auto e = m_StaticItems.end();
 		while (b != e)
 		{
 			(*b)->Reload(*m_ResourcesManager);
@@ -245,8 +291,8 @@ void BearUI::Reset()
 {
 	//m_cursor_manager.Reset();
 	
-	auto b = m_Items.begin();
-	auto e = m_Items.end();
+	auto b = m_StaticItems.begin();
+	auto e = m_StaticItems.end();
 	while (b != e)
 	{
 		(*b)->Reset();
@@ -375,16 +421,24 @@ void BearUI::SetPipeline(BearFactoryPointer<BearRHI::BearRHIShader>& Pixel, Bear
 	{
 		BearPipelineDescription PipelineDescription;
 		PipelineDescription.InputLayout.Elements[0] = BearInputLayoutElement("POSITION", VF_R32G32_FLOAT, 0);
-
+		PipelineDescription.InputLayout.Elements[1] = BearInputLayoutElement("COLOR", VF_R32G32B32A32_FLOAT, 8);
+		if (Flag.test(EPF_Alpha))
+		{
+			PipelineDescription.BlendState.RenderTarget[0].Enable = true;
+			PipelineDescription.BlendState.RenderTarget[0].ColorSrc = BF_SRC_ALPHA;
+			PipelineDescription.BlendState.RenderTarget[0].ColorDst = BF_INV_SRC_ALPHA;
+		}
+		
 		if (Flag.test(EPF_Textures))
 		{
-			PipelineDescription.InputLayout.Elements[1] = BearInputLayoutElement("UV", VF_R32G32_FLOAT, 8);
+			PipelineDescription.InputLayout.Elements[2] = BearInputLayoutElement("UV", VF_R32G32_FLOAT,24);
 			PipelineDescription.RootSignature = m_RootSignatureDefault;
 		}
 		else
 		{
 			PipelineDescription.RootSignature = m_RootSignatureColor;
 		}
+		PipelineDescription.RenderPass = m_RenderPass;
 		PipelineDescription.Shaders.Pixel = Pixel;
 		PipelineDescription.Shaders.Vertex = Vertex;
 		m_PipelinesMap.insert(Key, BearRenderInterface::CreatePipeline(PipelineDescription));
@@ -406,8 +460,6 @@ void BearUI::SetDescriptorHeap(BearFactoryPointer<BearRHI::BearRHITexture2D> Tex
 		if (Flags.test(DHF_Texture))
 		{
 			DescriptorHeapDescription.RootSignature = m_RootSignatureDefault;
-		//	DescriptorHeapDescription.SRVResurces[0] =Texture;
-//			DescriptorHeapDescription.Samplers[0] = m_SamplerDefault;
 		}
 		else
 		{
@@ -417,7 +469,11 @@ void BearUI::SetDescriptorHeap(BearFactoryPointer<BearRHI::BearRHITexture2D> Tex
 	//	DescriptorHeapDescription.UniformBuffers[1] = m_ConstantsColor;
 		m_DescriptorHeapsMap.insert(Key,BearRenderInterface::CreateDescriptorHeap( DescriptorHeapDescription));
 		item = m_DescriptorHeapsMap.find(Key);
+		item->second->SetShaderResource(0,Texture);
+		item->second->SetSampler(0, m_SamplerDefault);
+		item->second->SetUniformBuffer(0, m_ConstantsScreen);
 	}
+
 	m_CurrentContext->SetDescriptorHeap(item->second);
 }
 
@@ -439,9 +495,7 @@ void BearUI::Render(BearUITexture * texture)
 		m_CurrentContext->SetScissor(true, texture->Clip.x, texture->Clip.y, texture->Clip.x+ texture->Clip.x1, texture->Clip.y+ texture->Clip.y1);
 	}
 
-	bear_copy(reinterpret_cast<float*>(m_ConstantsColor->Lock()), texture->Color.R32G32B32A32, 4);
-	m_ConstantsColor->Unlock();
-	SetPipeline(m_ShaderDefaultPS, m_ShaderDefaultVS, EPF_Textures);
+	SetPipeline(m_ShaderDefaultPS, m_ShaderDefaultVS, EPF_Textures|( texture->Alpha? EPF_Alpha:0));
 	SetDescriptorHeap(texture->Texture, DHF_Texture);
 
 	BearFactoryPointer<BearRHI::BearRHIVertexBuffer>* VertexBufferDefault=0;
@@ -511,34 +565,53 @@ void BearUI::Render(BearUIText * text)
 {
 	
 
-	/*BearVertexDefault vertex[4];
-
 	bsize size = text->Text.size();
 	if (text->Font->Empty() || !size)return;
 
-	BearRenderInterface::SetPixelShader(BearDefaultManager::GetPixelShader(DPS_UIText));
-	BearRenderInterface::SetVertexShader(BearDefaultManager::GetVertexShader(DVS_UI));
 
-	BearRenderInterface::SetVertexShaderConstants(0, m_screen_constant);
+
 
 	if (text->Flags.test(BearUIStaticItem::UI_NoClip))
 	{
-		BearRenderInterface::DisableScissor();
+		m_CurrentContext->SetScissor(false, 0, 0, 0, 0);
 	}
 	else
 	{
-		BearRenderInterface::SetScissor(text->Clip.x, text->Clip.y, text->Clip.x + text->Clip.x1, text->Clip.y + text->Clip.y1);
+		m_CurrentContext->SetScissor(true, text->Clip.x, text->Clip.y, text->Clip.x + text->Clip.x1, text->Clip.y + text->Clip.y1);
 	}
 
-	bear_copy(reinterpret_cast<float*>(m_color_constant.Lock()), text->Color.GetFloat().array, 4);
-	m_color_constant.Unlock();
+	SetPipeline(m_ShaderFontPS, m_ShaderDefaultVS, EPF_Textures | EPF_Alpha );
+	{
+		auto item = m_Texture2DFromFonts.find(text->Font);
+		if (item == m_Texture2DFromFonts.end())
+		{
+			m_Texture2DFromFonts.insert(text->Font, text->Font->CreateTexture());
+		}
+		item = m_Texture2DFromFonts.find(text->Font);
 
-	BearRenderInterface::SetPixelShaderConstants(0, m_color_constant);
-	BearRenderInterface::SetPixelShaderResource(0, *text->Font->GetTexture(), BearDefaultManager::GetSamplerState());
-	BearRenderInterface::SetVertexBuffer(m_vertex_buffer);
-	BearRenderInterface::SetIndexBuffer(m_index_buffer);
+		SetDescriptorHeap(item->second, DHF_Texture);
+	}
+	
 
-	auto&font = *text->Font->GetListChars();
+	BearFactoryPointer<BearRHI::BearRHIVertexBuffer>* VertexBufferDefault = 0;
+	if (m_VertexBuffersDefaultCurrent == m_VertexBuffersDefault.end())
+	{
+		m_VertexBuffersDefault.push_back(BearRenderInterface::CreateVertexBuffer());
+		m_VertexBuffersDefault.back()->Create(sizeof(BearUIVertexManager::Default),bear_recommended_size( size*6), true);
+		VertexBufferDefault = &m_VertexBuffersDefault.back();
+		m_VertexBuffersDefaultCurrent = m_VertexBuffersDefault.end();
+	}
+	else
+	{
+		VertexBufferDefault = &*m_VertexBuffersDefaultCurrent;
+		m_VertexBuffersDefaultCurrent++;
+		if ((*VertexBufferDefault)->GetCount() < size * 6)
+		{
+			(*VertexBufferDefault)->Create(sizeof(BearUIVertexManager::Default), bear_recommended_size(size * 6), true);
+		}
+	}
+
+	auto&font = text->Font->GetListChars();
 	auto pos = text->Position+text->ShiftPosition;
 
 	float up = 0;
@@ -553,7 +626,8 @@ void BearUI::Render(BearUIText * text)
 		//up = -up;
 	}
 	BearVector4<float> TextureUV;
-
+	auto pv = (BearUIVertexManager::Default* )(*VertexBufferDefault)->Lock();
+	auto pv_start = pv;
 	for (bsize i = 0; i < size; i++)
 	{
 		bchar16 ch_ =BearEncoding::ToUTF16(text->Text[i]);
@@ -615,20 +689,31 @@ void BearUI::Render(BearUIText * text)
 					height = floor(height);
 					if (text->Flags.test(BearUIStaticItem::UI_NoClip) || text->Clip.inZone(BearVector4<float>(x, y, width, height)))
 					{
+						pv->position.set(x, y);;
+						pv->uv.set(TextureUV.x, TextureUV.y);
+						bear_copy(pv->color.Array, text->Color.R32G32B32A32,4); pv++;
 
-						vertex[0].Position.set(x, y + height);
-						vertex[1].Position.set(x + width, y);
-						vertex[2].Position.set(x, y);
-						vertex[3].Position.set(x + width, y + height);
-						vertex[0].TextureUV.set(TextureUV.x, TextureUV.y + TextureUV.y1);
-						vertex[1].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y);
-						vertex[2].TextureUV.set(TextureUV.x, TextureUV.y);
-						vertex[3].TextureUV.set(TextureUV.x1 + TextureUV.x, TextureUV.y1 + TextureUV.y);
+						pv->position.set(x + width, y);;
+						pv->uv.set(TextureUV.x1 + TextureUV.x, TextureUV.y); 
+						bear_copy(pv->color.Array, text->Color.R32G32B32A32, 4); pv++;
 
-						bear_copy(reinterpret_cast<BearVertexDefault*>(m_vertex_buffer.Lock()), vertex, 4);
-						m_vertex_buffer.Unlock();
+						pv->position.set(x, y + height);;
+						pv->uv.set(TextureUV.x, TextureUV.y + TextureUV.y1);
+						bear_copy(pv->color.Array, text->Color.R32G32B32A32, 4); pv++;
 
-						BearRenderInterface::DrawIndexed(6);
+
+						pv->position.set(x + width, y);;
+						pv->uv.set(TextureUV.x1 + TextureUV.x, TextureUV.y);
+						bear_copy(pv->color.Array, text->Color.R32G32B32A32, 4); pv++;
+
+						pv->position.set(x + width, y + height);;
+						pv->uv.set(TextureUV.x1 + TextureUV.x, TextureUV.y1 + TextureUV.y); 
+						bear_copy(pv->color.Array, text->Color.R32G32B32A32, 4); pv++;
+
+						pv->position.set(x, y + height);;
+						pv->uv.set(TextureUV.x, TextureUV.y + TextureUV.y1);
+						bear_copy(pv->color.Array, text->Color.R32G32B32A32, 4); pv++;
+
 					}
 
 
@@ -638,7 +723,14 @@ void BearUI::Render(BearUIText * text)
 		}
 
 	}
-	BearRenderInterface::DisableScissor();*/
+	(*VertexBufferDefault)->Unlock();
+	bsize count_vertex=  pv - pv_start;
+	m_CurrentContext->SetVertexBuffer(*VertexBufferDefault);
+	if(count_vertex)m_CurrentContext->Draw(count_vertex);
+	if (!text->Flags.test(BearUIStaticItem::UI_NoClip))
+	{
+		m_CurrentContext->SetScissor(false, 0, 0, 0, 0);
+	}
 }
 
 void BearUI::RenderSelectZone(BearUIText * text)
@@ -774,9 +866,19 @@ void BearUI::Render(BearUITriangle * triangle)
 	BearRenderInterface::DisableScissor();*/
 }
 
-void BearUI::AttactViewportAsFrameBuffer(BearFactoryPointer<BearRHI::BearRHIViewport> frameBuffer)
+
+
+void BearUI::SetRTFormat(BearRenderTargetFormat RTF)
 {
-	FrameBuffer.ViewportAsFrameBuffer = frameBuffer;
+	m_RTF = RTF;
+	m_PipelinesMap.clear();
+	if (!m_RenderPass.empty())
+	{
+		BearRenderPassDescription  Description;
+		Description.RenderTargets[0].Format = RTF;
+		m_RenderPass = BearRenderInterface::CreateRenderPass(Description);
+		
+	}
 }
 
 void BearUI::UpdateFocus()

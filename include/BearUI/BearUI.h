@@ -21,25 +21,25 @@ public:
 	void OnChar(bchar16 ch);
 
 	~BearUI();
-
+	void PopItem(BearUIItem* item);
+	void  PopItem(BearUIStaticItem* item);
 	BearUIItem* PushItem(BearUIItem*item);
 	BearUIStaticItem* PushItem(BearUIStaticItem*item);
+	BearUIItem* PushItemInBegin(BearUIItem* item);
+	BearUIStaticItem* PushItemInBegin(BearUIStaticItem* item);
 	//inline BearUICursorManager&GetCursorManager() { return m_cursor_manager; }
 	template<class C>
 	inline void SetResourcesManager()
 	{
 		m_ResourcesManager = BearRef<BearUIResourcesManager>(bear_new<C>());
 	}
-	void AttactViewportAsFrameBuffer(BearFactoryPointer<BearRHI::BearRHIViewport> FrameBuffer);
+	void SetRTFormat(BearRenderTargetFormat RTF);
 private:
-	void UpdateFocus();
-	struct 
-	{
-		BearFactoryPointer<BearRHI::BearRHIViewport> ViewportAsFrameBuffer;
-	} FrameBuffer;
+	BearRenderTargetFormat m_RTF;
+	BearFactoryPointer<BearRHI::BearRHIRenderPass> m_RenderPass;
 
+	void UpdateFocus();
 	BearFactoryPointer<BearRHI::BearRHIUniformBuffer> m_ConstantsScreen;
-	BearFactoryPointer<BearRHI::BearRHIUniformBuffer> m_ConstantsColor;
 	BearVector4<float> m_Screen;
 	BearFactoryPointer<BearRHI::BearRHIVertexBuffer> m_VertexBufferColor;
 	BearVector < BearFactoryPointer<BearRHI::BearRHIVertexBuffer>> m_VertexBuffersDefault;
@@ -69,7 +69,9 @@ private:
 	enum EPipelineFlag
 	{
 		EPF_Textures= 1<<0,
+
 		EPF_Alpha= 1 << 1,
+		EPF_Font = 1 << 2,
 	};
 	struct PipelineKey
 	{
@@ -84,7 +86,7 @@ private:
 		}
 	};
 	BearMap< PipelineKey, BearFactoryPointer<BearRHI::BearRHIPipeline>> m_PipelinesMap;
-
+	BearMap< BearFont*, BearFactoryPointer<BearRHI::BearRHITexture2D>> m_Texture2DFromFonts;
 	void SetPipeline(BearFactoryPointer<BearRHI::BearRHIShader>& Pixel, BearFactoryPointer<BearRHI::BearRHIShader>&Vertex, BearFlags<uint32> Flag);
 
 	enum EDescriptorHeapFlag
