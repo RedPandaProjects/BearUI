@@ -14,6 +14,12 @@ protected:
 	void Frame();
 	void Render();
 	void Load(BearRenderTargetFormat output_format);
+	enum class ShaderType
+	{
+		DefaultPixel,
+		DefaultVertex,
+	};
+	virtual void LoadShader(BearFactoryPointer<BearRHI::BearRHIShader>& Shader, ShaderType type);
 protected:
 	virtual void SetMousePosition(const BearFVector2& position) = 0;
 	virtual BearFVector2 GetMousePosition()const = 0;

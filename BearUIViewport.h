@@ -12,10 +12,11 @@ public:
 	virtual void Unload();
 	virtual void Render();
 protected:
+
 	virtual void SetMousePosition(const BearFVector2& position);
 	virtual BearFVector2 GetMousePosition()const;
 	virtual BearFVector2 GetSizeViewport()const;
 	virtual void OnEvent(BearEventWindows& e);
-private:
+protected:
 	BearFactoryPointer<BearRHI::BearRHIViewport> m_Viewport;
 };

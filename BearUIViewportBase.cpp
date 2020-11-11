@@ -74,26 +74,26 @@ void BearUIViewportBase::Render()
     ImDrawData*DrawData = ImGui::GetDrawData();
     if (DrawData->TotalVtxCount == 0|| DrawData->TotalIdxCount == 0)return;
     if (DrawData->DisplaySize.x <= 0.0f || DrawData->DisplaySize.y <= 0.0f)return;
-    if (DrawData->TotalVtxCount> m_VertexBuffer->GetCount())
+    if (static_cast<bsize>(DrawData->TotalVtxCount)> m_VertexBuffer->GetCount())
     {
         m_VertexBuffer->Create(sizeof(ImGuiVertex), DrawData->TotalVtxCount, true);
     }
-    if (DrawData->TotalIdxCount > m_IndexBuffer->GetCount())
+    if (static_cast<bsize>(DrawData->TotalIdxCount) > m_IndexBuffer->GetCount())
     {
-        m_IndexBuffer->Create(DrawData->TotalIdxCount, true);
+        m_IndexBuffer->Create(static_cast<bsize>(DrawData->TotalIdxCount), true);
     }
     {
         ImGuiVertex* VertexDest = (ImGuiVertex*) m_VertexBuffer->Lock();
         uint32* IndexDest = m_IndexBuffer->Lock();
-        for (bsize n = 0; n < DrawData->CmdListsCount; n++)
+        for (bsize n = 0; n < static_cast<bsize>(DrawData->CmdListsCount); n++)
         {
             const ImDrawList* CmdList = DrawData->CmdLists[n];
             const ImDrawVert* VertexSource = CmdList->VtxBuffer.Data;
-            for (bsize i = 0; i < CmdList->VtxBuffer.Size; i++)
+            for (bsize i = 0; i < static_cast<bsize>(CmdList->VtxBuffer.Size); i++)
             {
                 BearColor ColorSource(VertexSource->col);
-                VertexDest->x =roundf( VertexSource->pos.x);
-                VertexDest->y =roundf(VertexSource->pos.y);
+                VertexDest->x =VertexSource->pos.x;
+                VertexDest->y =VertexSource->pos.y;
                 VertexDest->r = ColorSource.R32G32B32A32[0];
                 VertexDest->g = ColorSource.R32G32B32A32[1];
                 VertexDest->b = ColorSource.R32G32B32A32[2];
@@ -119,10 +119,10 @@ void BearUIViewportBase::Render()
         m_UniformBuffer->Unlock();
     }
     {
-        for (bsize n = 0; n < DrawData->CmdListsCount; n++)
+        for (bsize n = 0; n < static_cast<bsize>(DrawData->CmdListsCount); n++)
         {
             const ImDrawList* CmdList = DrawData->CmdLists[n];
-            for (bsize i = 0; i < CmdList->CmdBuffer.Size; i++)
+            for (bsize i = 0; i < static_cast<bsize>(CmdList->CmdBuffer.Size); i++)
             {
                 const ImDrawCmd* DrawCmd = &CmdList->CmdBuffer[static_cast<int>(i)];
                 auto SRV = m_TextureMap[DrawCmd->TextureId];
@@ -149,10 +149,10 @@ void BearUIViewportBase::Render()
         
         bsize IndexOffset = 0;
         bsize VertexOffset = 0;
-        for (bsize n = 0; n < DrawData->CmdListsCount; n++)
+        for (bsize n = 0; n < static_cast<bsize>(DrawData->CmdListsCount); n++)
         {
             const ImDrawList* CmdList = DrawData->CmdLists[n];
-            for (bsize i = 0; i < CmdList->CmdBuffer.Size; i++)
+            for (bsize i = 0; i < static_cast<bsize>(CmdList->CmdBuffer.Size); i++)
             {
                 const ImDrawCmd* DrawCmd = &CmdList->CmdBuffer[static_cast<int>(i)];
                 if (DrawCmd->UserCallback != NULL)
@@ -195,21 +195,6 @@ void BearUIViewportBase::Render()
     }
     BearUIObject::Ñleanup();
 }
-inline void LoadShader(BearFactoryPointer<BearRHI::BearRHIShader>& Shader, const bchar* Entry, const bchar* name)
-{
-    BearFileStream File;
-    BearString Text, Error;
-    BearMap<BearStringConteniar, BearStringConteniar> Defines;
-
-    BEAR_ASSERT(File.Open(name));
-    File.ToString(Text, BearEncoding::ANSI);
-
-    BEAR_ASSERT(Shader->LoadAsText(*Text, Entry, Defines, Error, &GIncluderDefault));
-    BearString new_file;
-    new_file.append(name).append(TEXT(".bin"));
-    BEAR_ASSERT(File.Open(*new_file, File.M_Write));
-    File.WriteBuffer(Shader->GetPointer(), Shader->GetSize());
-}
 void BearUIViewportBase::Load(BearRenderTargetFormat output_format)
 {
     BearFactoryPointer<BearRHI::BearRHIRenderPass> RenderPass;
@@ -217,9 +202,9 @@ void BearUIViewportBase::Load(BearRenderTargetFormat output_format)
     m_Context = BearRenderInterface::CreateContext();
 
     auto PixelShader = BearRenderInterface::CreatePixelShader();
-    LoadShader(PixelShader, TEXT("main"), TEXT("imgui.ps.hlsl"));
+    LoadShader(PixelShader, ShaderType::DefaultPixel);
     auto VertexShader = BearRenderInterface::CreateVertexShader();
-    LoadShader(VertexShader, TEXT("main"), TEXT("imgui.vs.hlsl"));
+    LoadShader(VertexShader, ShaderType::DefaultVertex);
 
     m_VertexBuffer = BearRenderInterface::CreateVertexBuffer();
     m_IndexBuffer = BearRenderInterface::CreateIndexBuffer();
@@ -243,7 +228,7 @@ void BearUIViewportBase::Load(BearRenderTargetFormat output_format)
         Description.InputLayout.Elements[0] = BearInputLayoutElement("POSITION", BearVertexFormat::R32G32_FLOAT, 0);
         Description.InputLayout.Elements[1] = BearInputLayoutElement("COLOR", BearVertexFormat::R32G32B32A32_FLOAT, 8);
         Description.InputLayout.Elements[2] = BearInputLayoutElement("UV", BearVertexFormat::R32G32_FLOAT, 24);
-
+        Description.RasterizerState.CullMode = BearRasterizerCullMode::None;
         Description.RenderPass = RenderPass;
         Description.RootSignature = m_RootSignature;
 
@@ -279,6 +264,34 @@ void BearUIViewportBase::Load(BearRenderTargetFormat output_format)
         m_FontDescriptorHeap->SetUniformBuffer(0, m_UniformBuffer);
     }
     BEAR_ASSERT(GetTextureID(m_TextureFont) == 1);
+}
+
+void BearUIViewportBase::LoadShader(BearFactoryPointer<BearRHI::BearRHIShader>& Shader, ShaderType type)
+{
+    BearFileStream File;
+    BearString Text, Error;
+    BearMap<BearStringConteniar, BearStringConteniar> Defines;
+    const bchar* Name = 0;
+    switch (type)
+    {
+    case BearUIViewportBase::ShaderType::DefaultPixel:
+        Name = "imgui.ps.hlsl";
+        break;
+    case BearUIViewportBase::ShaderType::DefaultVertex:
+        Name = "imgui.vs.hlsl";
+        break;
+    default:
+        BEAR_ASSERT(0);
+        break;
+    }
+    BEAR_ASSERT(File.Open(Name));
+    File.ToString(Text, BearEncoding::ANSI);
+
+    BEAR_ASSERT(Shader->LoadAsText(*Text, TEXT("main"), Defines, Error, &GIncluderDefault));
+    BearString new_file;
+    new_file.append(Name).append(TEXT(".bin"));
+    BEAR_ASSERT(File.Open(*new_file, File.M_Write));
+    File.WriteBuffer(Shader->GetPointer(), Shader->GetSize());
 }
 
 void BearUIViewportBase::OnKeyDown(BearInput::Key key)
