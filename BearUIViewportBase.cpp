@@ -44,8 +44,28 @@ uint32 BearUIViewportBase::GetTextureID(BearFactoryPointer<BearRHI::BearRHIShade
     return static_cast<uint32>(m_TextureMap.size());
 }
 
+void BearUIViewportBase::FreeTextureID(uint32 id)
+{
+    auto ItemSRV = m_TextureMap.find(id);
+    BEAR_VERIFY(ItemSRV != m_TextureMap.end());
+
+    m_TexturesFree.push_back(id);
+
+    m_TextureMap.erase(ItemSRV);
+
+    auto ItemHEAP = m_HeapMap.find(id);
+    if (m_HeapMap.end() != ItemHEAP)
+        m_HeapMap.erase(ItemHEAP);
+    if (m_TextureMap.empty())
+    {
+        m_TexturesFree.clear();
+    }
+}
+
 void BearUIViewportBase::Unload()
 {
+    BEAR_VERIFY(m_TextureMap.empty());
+    BEAR_VERIFY(m_HeapMap.empty());
     m_Context.clear();
     m_VertexBuffer.clear();
     m_IndexBuffer.clear();
@@ -57,6 +77,7 @@ void BearUIViewportBase::Unload()
     m_FontDescriptorHeap.clear();
     m_HeapMap.clear();
     m_TextureMap.clear();
+    m_TexturesFree.clear();
 }
 
 
@@ -135,7 +156,7 @@ void BearUIViewportBase::Render()
                     DescriptorHeap->SetSampler(0, m_Sampler);
                     DescriptorHeap->SetShaderResource(0, SRV);
                     DescriptorHeap->SetUniformBuffer(0, m_UniformBuffer);
-                    m_HeapMap.insert(DrawCmd->TextureId, m_FontDescriptorHeap);
+                    m_HeapMap.insert(DrawCmd->TextureId, DescriptorHeap);
                 }
             }
         }
@@ -173,6 +194,7 @@ void BearUIViewportBase::Render()
                 }
                 else
                 {
+                    BEAR_VERIFY(DrawCmd->TextureId);
                     if (DrawCmd->TextureId == 1)
                     {
                         m_Context->SetDescriptorHeap(m_FontDescriptorHeap);
@@ -246,6 +268,7 @@ void BearUIViewportBase::Load(BearRenderTargetFormat output_format)
         int tex_w, tex_h;
         io.Fonts->GetTexDataAsRGBA32(&tex_pixels, &tex_w, &tex_h);
         m_TextureFont = BearRenderInterface::CreateTexture2D(static_cast<bsize>(tex_w), static_cast<bsize>(tex_h), 1, 1, BearTexturePixelFormat::R8G8B8A8, BearTextureUsage::Static, tex_pixels);
+        io.Fonts->TexID = 1;
     }
     {
         m_UniformBuffer = BearRenderInterface::CreateUniformBuffer(sizeof(float) * 4, 1, true);
@@ -383,7 +406,6 @@ void BearUIViewportBase::ImGuiInitialize()
         io.KeyMap[ImGuiKey_Y] = 'Y';
         io.KeyMap[ImGuiKey_Z] = 'Z';
 
-        io.Fonts->TexID = 1;
     }
 }
 

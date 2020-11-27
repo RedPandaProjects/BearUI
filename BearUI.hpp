@@ -7,8 +7,8 @@
 #define BEARUI_API  BEARDLL_EXPORT
 #else
 #define BEARUI_API  BEARDLL_IMPORT
+#define IMGUI_USER_CONFIG "..\imconfig.h"
 #endif
-
 
 #include "imgui/imgui.h"
 #undef IMGUI_API

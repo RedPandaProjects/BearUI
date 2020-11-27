@@ -10,6 +10,7 @@ public:
 	virtual void Push(BearUIObject* obj, bool auto_delete = true);
 	virtual void Pop(BearUIObject* obj);
 	uint32 GetTextureID(BearFactoryPointer<BearRHI::BearRHIShaderResource> SRV);
+	void FreeTextureID(uint32 id);
 protected:
 	void Frame();
 	void Render();
@@ -46,6 +47,7 @@ private:
 	BearFactoryPointer<BearRHI::BearRHIDescriptorHeap> m_FontDescriptorHeap;
 	BearMap<uint32, BearFactoryPointer<BearRHI::BearRHIDescriptorHeap>> m_HeapMap;
 	BearMap<uint32, BearFactoryPointer<BearRHI::BearRHIShaderResource>> m_TextureMap;
+	BearVector<uint32> m_TexturesFree;
 protected:
 	BearFactoryPointer<BearRHI::BearRHIContext> m_Context;
 };
